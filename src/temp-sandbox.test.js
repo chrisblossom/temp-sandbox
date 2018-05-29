@@ -78,7 +78,7 @@ describe('absolutePath', () => {
     test('handles path outside of sandbox dir', () => {
         const result = sandbox.absolutePath(process.cwd());
 
-        const expected = sandbox.dir + process.cwd();
+        const expected = path.normalize(sandbox.dir + path.sep + process.cwd());
         expect(result).toEqual(expected);
     });
 });
