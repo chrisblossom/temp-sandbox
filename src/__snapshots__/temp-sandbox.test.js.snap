@@ -18,10 +18,6 @@ exports[`deleteFile handles root async 1`] = `[Error: Use sandbox.destroySandbox
 
 exports[`deleteFile handles root sync 1`] = `[Error: Use sandbox.destroySandbox() to delete the sandbox.]`;
 
-exports[`deleteFile handles undefined async 1`] = `[TypeError: Path must be a string. Received undefined]`;
-
-exports[`deleteFile handles undefined sync 1`] = `[TypeError: Path must be a string. Received undefined]`;
-
 exports[`setups initial sandbox 1`] = `
 TempSandbox {
   "absolutePath": [Function bound absolutePath],

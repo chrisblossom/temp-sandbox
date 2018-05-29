@@ -338,14 +338,15 @@ describe('deleteFile', () => {
         });
     });
 
-    describe('handles undefined', () => {
+    describe('throws when undefined', () => {
         test('async', async () => {
             expect.hasAssertions();
             try {
                 // $FlowIgnore
                 await sandbox.deleteFile();
             } catch (error) {
-                expect(error).toMatchSnapshot();
+                expect(error.message.includes('string')).toEqual(true);
+                expect(error.message.includes('undefined')).toEqual(true);
             }
         });
 
@@ -355,7 +356,8 @@ describe('deleteFile', () => {
                 // $FlowIgnore
                 sandbox.deleteFileSync();
             } catch (error) {
-                expect(error).toMatchSnapshot();
+                expect(error.message.includes('string')).toEqual(true);
+                expect(error.message.includes('undefined')).toEqual(true);
             }
         });
     });
