@@ -567,9 +567,9 @@ describe('clean', () => {
 
         beforeEach(async () => {
             await Promise.all([
-                sandbox.createFileSync(file1),
-                sandbox.createFileSync(file2),
-                sandbox.createFileSync(file3),
+                sandbox.createFile(file1),
+                sandbox.createFile(file2),
+                sandbox.createFile(file3),
             ]);
         });
 

@@ -3,7 +3,7 @@
 [![npm](https://img.shields.io/npm/v/temp-sandbox.svg?label=npm%20version)](https://www.npmjs.com/package/temp-sandbox)
 [![Linux Build Status](https://img.shields.io/circleci/project/github/chrisblossom/temp-sandbox/master.svg?label=linux%20build)](https://circleci.com/gh/chrisblossom/temp-sandbox/tree/master)
 [![Windows Build Status](https://img.shields.io/appveyor/ci/chrisblossom/temp-sandbox/master.svg?label=windows%20build)](https://ci.appveyor.com/project/chrisblossom/temp-sandbox/branch/master)
-[![Code Coverage](https://img.shields.io/coveralls/github/chrisblossom/temp-sandbox/master.svg)](https://coveralls.io/github/chrisblossom/temp-sandbox?branch=master)
+[![Code Coverage](https://img.shields.io/codecov/c/github/chrisblossom/temp-sandbox/master.svg)](https://codecov.io/gh/chrisblossom/temp-sandbox/branch/master)
 
 ## About
 
