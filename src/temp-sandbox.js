@@ -293,7 +293,13 @@ class TempSandbox {
 
         await Promise.all(pending);
 
-        return result;
+        const sortedResult = Object.keys(result)
+            .sort()
+            .reduce((acc, item) => {
+                return { ...acc, [item]: result[item] };
+            }, {});
+
+        return sortedResult;
     }
 
     getAllFilesHashSync() {

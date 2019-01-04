@@ -514,6 +514,62 @@ describe('getFileList', () => {
 });
 
 describe('getAllFilesHash', () => {
+    describe('sorts object keys', () => {
+        beforeEach(async () => {
+            await Promise.all([
+                sandbox.createFile(
+                    '.backtrack-stats.json',
+                    '// .backtrack-stats.json',
+                ),
+                sandbox.createFile('package.json', {
+                    name: 'test-package',
+                }),
+
+                sandbox.createFile('files/file1.js', '// file1.js'),
+                sandbox.createFile('file1.js', '// file1.js'),
+
+                sandbox.createFile(
+                    'backtrack.config.js',
+                    `module.exports = ${JSON.stringify({
+                        files: {
+                            src: 'files/file1.js',
+                            dest: 'file1.js',
+                            ignoreUpdates: true,
+                        },
+                    })}`,
+                ),
+            ]);
+        });
+
+        const checkResult = (filesHash) => {
+            expect(filesHash).toEqual({
+                '.backtrack-stats.json': '75f5b01f2252c7f63631a5d17d0101fe',
+                'backtrack.config.js': 'c940bddf3d3e702288435d3d5e4e6918',
+                'file1.js': '7f477fcd51e87d9e65b134b17771dc03',
+                'files/file1.js': '7f477fcd51e87d9e65b134b17771dc03',
+                'package.json': 'f2b2d4935b7fc04f67fdd526e0bbeafe',
+            });
+
+            expect(Object.keys(filesHash)).toEqual([
+                '.backtrack-stats.json',
+                'backtrack.config.js',
+                'file1.js',
+                'files/file1.js',
+                'package.json',
+            ]);
+        };
+
+        test('async', async () => {
+            const filesHash = await sandbox.getAllFilesHash();
+            checkResult(filesHash);
+        });
+
+        test('sync', () => {
+            const filesHash = sandbox.getAllFilesHashSync();
+            checkResult(filesHash);
+        });
+    });
+
     describe('returns all files in sandbox', () => {
         beforeEach(async () => {
             await Promise.all([
