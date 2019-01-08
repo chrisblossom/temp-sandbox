@@ -3,7 +3,6 @@
 import path from 'path';
 import os from 'os';
 import del from 'del';
-import slash from 'slash';
 import fs from 'fs';
 import { createHash } from 'crypto';
 import makeDir from 'make-dir';
@@ -262,21 +261,11 @@ class TempSandbox {
     async getFileList() {
         const fileList = await readDirDeep(this.dir);
 
-        const normalizedList = fileList.map((file) => {
-            const normalizedPath = slash(file);
-
-            return normalizedPath;
-        });
-
-        return normalizedList;
+        return fileList;
     }
 
     getFileListSync() {
-        const fileList = readDirDeep.sync(this.dir).map((file) => {
-            const normalizedPath = slash(file);
-
-            return normalizedPath;
-        });
+        const fileList = readDirDeep.sync(this.dir);
 
         return fileList;
     }

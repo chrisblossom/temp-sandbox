@@ -49,7 +49,6 @@
     "parent-module": "^1.0.0",
     "read-dir-deep": "^3.0.0",
     "read-pkg-up": "^4.0.0",
-    "slash": "^2.0.0",
     "util.promisify": "^1.0.0"
   }
 }
