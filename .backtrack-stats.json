@@ -50,7 +50,6 @@
             "lint": "backtrack lint",
             "lint.fix": "backtrack lint.fix",
             "prepublishOnly": "backtrack prepublishOnly",
-            "prepush": "backtrack prepush",
             "test": "backtrack test",
             "test.ci": "backtrack test.ci",
             "test.ci-pretest": "backtrack test.ci-pretest",
