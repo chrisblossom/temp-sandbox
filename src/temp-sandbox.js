@@ -375,4 +375,4 @@ class TempSandbox {
     }
 }
 
-module.exports = TempSandbox;
+export default TempSandbox;
