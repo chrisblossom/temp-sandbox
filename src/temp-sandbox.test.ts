@@ -1,11 +1,21 @@
 import fs from 'fs';
 import path from 'path';
 import makeDir from 'make-dir';
-import TempSandbox from './temp-sandbox';
+
+function TempSandbox(...args: any) {
+    jest.resetModules();
+
+    const TempSandboxActual = require('./temp-sandbox');
+
+    const tempSandBox = new TempSandboxActual(...args);
+
+    return tempSandBox;
+}
 
 let sandbox: any;
 
 beforeEach(() => {
+    // @ts-ignore
     sandbox = new TempSandbox();
 });
 
@@ -36,6 +46,7 @@ test('cleans directory if already exists', () => {
 
     expect(fs.existsSync(file1)).toEqual(true);
 
+    // @ts-ignore
     sandbox = new TempSandbox();
 
     expect(fs.existsSync(file1)).toEqual(false);
@@ -45,6 +56,7 @@ describe('options', () => {
     test('handle randomDir', () => {
         sandbox.destroySandbox();
 
+        // @ts-ignore
         sandbox = new TempSandbox({ randomDir: true });
 
         const sandboxDirParsed = path.parse(sandbox.dir);
@@ -783,12 +795,14 @@ describe('destroySandbox', () => {
 
         test('async', async () => {
             await sandbox.destroySandbox();
+            // @ts-ignore
             sandbox = new TempSandbox();
             checkResult();
         });
 
         test('sync', () => {
             sandbox.destroySandboxSync();
+            // @ts-ignore
             sandbox = new TempSandbox();
             checkResult();
         });
