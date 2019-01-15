@@ -12,7 +12,7 @@ import toPromise from 'util.promisify';
 const writeFile = toPromise(fs.writeFile);
 const readFile = toPromise(fs.readFile);
 
-function getFileHash(contents: Buffer) {
+function getFileHash(contents: Buffer): string {
     const hash = createHash('md5')
         .update(contents)
         .digest('hex');
@@ -135,7 +135,7 @@ class TempSandbox {
         this.destroySandboxSync = this.destroySandboxSync.bind(this);
     }
 
-    absolutePath(dir: string) {
+    absolutePath(dir: string): string {
         // Treat the directory as if it is the root of the filesystem
         const base = path.join('/', dir);
 
@@ -144,18 +144,18 @@ class TempSandbox {
         return path.resolve(joinWithBase);
     }
 
-    createDir(dir: string) {
+    createDir(dir: string): Promise<string> {
         const normalized = this.absolutePath(dir);
         return makeDir(normalized);
     }
 
-    createDirSync(dir: string) {
+    createDirSync(dir: string): string {
         const normalized = this.absolutePath(dir);
 
         return makeDir.sync(normalized);
     }
 
-    async createFile(file: string, contents: any = '') {
+    async createFile(file: string, contents: any = ''): Promise<void> {
         const fileDir = path.parse(file).dir;
 
         if (fileDir) {
@@ -167,7 +167,7 @@ class TempSandbox {
         await writeFile(filePath, fileContents);
     }
 
-    createFileSync(file: string, contents: any = '') {
+    createFileSync(file: string, contents: any = ''): void {
         const fileDir = path.parse(file).dir;
 
         if (fileDir) {
@@ -180,7 +180,7 @@ class TempSandbox {
         fs.writeFileSync(filePath, fileContents);
     }
 
-    deleteFile(file: string) {
+    deleteFile(file: string): Promise<string[]> {
         const filePath = this.absolutePath(file);
 
         if (filePath === this.dir) {
@@ -198,7 +198,7 @@ class TempSandbox {
         return removed;
     }
 
-    deleteFileSync(file: string) {
+    deleteFileSync(file: string): string[] {
         const filePath = this.absolutePath(file);
 
         if (filePath === this.dir) {
@@ -243,7 +243,7 @@ class TempSandbox {
         return contents;
     }
 
-    async getFileHash(file: string) {
+    async getFileHash(file: string): Promise<string> {
         const filePath = this.absolutePath(file);
         const contents = await readFile(filePath);
 
@@ -252,7 +252,7 @@ class TempSandbox {
         return fileHash;
     }
 
-    getFileHashSync(file: string) {
+    getFileHashSync(file: string): string {
         const filePath = this.absolutePath(file);
         const contents = fs.readFileSync(filePath);
 
@@ -261,14 +261,14 @@ class TempSandbox {
         return fileHash;
     }
 
-    async getFileList() {
-        const fileList: Promise<string[]> = await readDirDeep(this.dir);
+    async getFileList(): Promise<string[]> {
+        const fileList = await readDirDeep(this.dir);
 
         return fileList;
     }
 
-    getFileListSync() {
-        const fileList: string[] = readDirDeep.sync(this.dir);
+    getFileListSync(): string[] {
+        const fileList = readDirDeep.sync(this.dir);
 
         return fileList;
     }
@@ -310,7 +310,7 @@ class TempSandbox {
         return result;
     }
 
-    async clean() {
+    async clean(): Promise<string[]> {
         try {
             const removed = await del('**/*', {
                 root: this.dir,
@@ -340,7 +340,7 @@ class TempSandbox {
         }
     }
 
-    cleanSync() {
+    cleanSync(): string[] {
         const removed = del.sync('**/*', {
             root: this.dir,
             cwd: this.dir,
@@ -350,7 +350,7 @@ class TempSandbox {
         return removed;
     }
 
-    async destroySandbox() {
+    async destroySandbox(): Promise<string[]> {
         const removed = await del(this.dir, { force: true });
 
         for (const key of Object.keys(this)) {
@@ -365,7 +365,7 @@ class TempSandbox {
         return removed;
     }
 
-    destroySandboxSync() {
+    destroySandboxSync(): string[] {
         const removed = del.sync(this.dir, { force: true });
 
         for (const key of Object.keys(this)) {
