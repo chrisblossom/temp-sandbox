@@ -34,8 +34,7 @@
     "test.ci": "backtrack test.ci",
     "test.ci-pretest": "backtrack test.ci-pretest",
     "test.update": "jest --updateSnapshot",
-    "test.watch": "jest --watch src",
-    "test.watch-e2e": "jest --watch e2e-tests",
+    "test.watch": "jest --watch",
     "typescript": "backtrack typescript"
   },
   "devDependencies": {
