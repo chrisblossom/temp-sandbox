@@ -1,11 +1,9 @@
-/* @flow */
-
 import fs from 'fs';
 import path from 'path';
 import makeDir from 'make-dir';
 import TempSandbox from './temp-sandbox';
 
-let sandbox;
+let sandbox: any;
 
 beforeEach(() => {
     sandbox = new TempSandbox();
@@ -87,7 +85,7 @@ describe('createDir', () => {
     describe('creates directory inside sandbox dir', () => {
         const pathname = 'nested/path';
 
-        const checkResult = (result) => {
+        const checkResult = (result: string) => {
             const expectedDir = sandbox.absolutePath(pathname);
 
             expect(result).toEqual(expectedDir);
@@ -292,7 +290,7 @@ describe('createFile', () => {
 describe('deleteFile', () => {
     describe('removes file', () => {
         const file = 'file1.js';
-        let fullFilePath;
+        let fullFilePath: any;
 
         beforeEach(async () => {
             await sandbox.createFile(file);
@@ -300,7 +298,7 @@ describe('deleteFile', () => {
             expect(fs.existsSync(fullFilePath)).toEqual(true);
         });
 
-        const checkResult = (removed) => {
+        const checkResult = (removed: string[]) => {
             expect(fs.existsSync(fullFilePath)).toEqual(false);
             expect(removed).toEqual([fullFilePath]);
         };
@@ -342,7 +340,6 @@ describe('deleteFile', () => {
         test('async', async () => {
             expect.hasAssertions();
             try {
-                // $FlowIgnore
                 await sandbox.deleteFile();
             } catch (error) {
                 expect(error.message.includes('string')).toEqual(true);
@@ -353,7 +350,6 @@ describe('deleteFile', () => {
         test('sync', () => {
             expect.hasAssertions();
             try {
-                // $FlowIgnore
                 sandbox.deleteFileSync();
             } catch (error) {
                 expect(error.message.includes('string')).toEqual(true);
@@ -481,7 +477,7 @@ describe('getFileList', () => {
             ]);
         });
 
-        const checkResult = (fileList) => {
+        const checkResult = (fileList: string[]) => {
             expect(fileList).toEqual([
                 'a/b/c/file3.js',
                 'file1.js',
@@ -541,7 +537,7 @@ describe('getAllFilesHash', () => {
             ]);
         });
 
-        const checkResult = (filesHash) => {
+        const checkResult = (filesHash: { [key: string]: string }) => {
             expect(filesHash).toEqual({
                 '.backtrack-stats.json': '75f5b01f2252c7f63631a5d17d0101fe',
                 'backtrack.config.js': 'c940bddf3d3e702288435d3d5e4e6918',
@@ -579,7 +575,7 @@ describe('getAllFilesHash', () => {
             ]);
         });
 
-        const checkResult = (filesHash) => {
+        const checkResult = (filesHash: { [key: string]: string }) => {
             expect(filesHash).toEqual({
                 'a/b/c/file3.js': 'd41d8cd98f00b204e9800998ecf8427e',
                 'file1.js': 'd41d8cd98f00b204e9800998ecf8427e',
@@ -599,7 +595,7 @@ describe('getAllFilesHash', () => {
     });
 
     describe('handles empty sandbox', () => {
-        const checkResult = (filesHash) => {
+        const checkResult = (filesHash: { [key: string]: string }) => {
             expect(filesHash).toEqual({});
         };
 
@@ -629,7 +625,7 @@ describe('clean', () => {
             ]);
         });
 
-        const checkResult = (removed) => {
+        const checkResult = (removed: string[]) => {
             const file1Exists = fs.existsSync(path.resolve(sandbox.dir, file1));
             const file2Exists = fs.existsSync(path.resolve(sandbox.dir, file2));
             const file3Exists = fs.existsSync(path.resolve(sandbox.dir, file3));
@@ -668,7 +664,7 @@ describe('clean', () => {
     });
 
     describe('handles empty sandbox', () => {
-        const checkResult = (removed) => {
+        const checkResult = (removed: string[]) => {
             expect(removed).toEqual([]);
 
             const dirExists = fs.statSync(sandbox.dir).isDirectory();
@@ -691,9 +687,9 @@ describe('destroySandbox', () => {
     /**
      * https://stackoverflow.com/a/35033472
      */
-    const getAllMethods = (obj) => {
+    const getAllMethods = (obj: typeof TempSandbox) => {
         /* eslint-disable no-param-reassign,no-cond-assign,no-loop-func */
-        let props = [];
+        let props: string[] = [];
 
         do {
             const l = Object.getOwnPropertyNames(obj)
@@ -709,7 +705,6 @@ describe('destroySandbox', () => {
                 );
             props = props.concat(l);
         } while (
-            // $FlowIgnore
             (obj = Object.getPrototypeOf(obj)) && // walk-up the prototype chain
             Object.getPrototypeOf(obj) // not the the Object prototype methods (hasOwnProperty, etc...)
         );
@@ -719,7 +714,7 @@ describe('destroySandbox', () => {
     };
 
     describe('removes sandbox directory and removes this references', () => {
-        let sandboxDir;
+        let sandboxDir: any;
         beforeEach(async () => {
             await sandbox.createFile('a/b/c/file1.js');
             sandboxDir = sandbox.dir;
@@ -728,7 +723,7 @@ describe('destroySandbox', () => {
             expect(dirExists).toEqual(true);
         });
 
-        const checkResult = (removed) => {
+        const checkResult = (removed: string[]) => {
             expect(removed).toEqual([sandboxDir]);
 
             expect(fs.existsSync(sandboxDir)).toEqual(false);
@@ -738,7 +733,6 @@ describe('destroySandbox', () => {
 
             methods.forEach((method) => {
                 try {
-                    // $FlowIgnore
                     const fn = sandbox[method];
                     expect(fn.name).toEqual('sandboxDestroyed');
 
@@ -780,7 +774,6 @@ describe('destroySandbox', () => {
 
             const methods = getAllMethods(sandbox);
             methods.forEach((method) => {
-                // $FlowIgnore
                 const item = sandbox[method];
                 if (typeof item === 'function') {
                     expect(item.name).toEqual(`bound ${method}`);

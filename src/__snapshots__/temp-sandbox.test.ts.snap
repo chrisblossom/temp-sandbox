@@ -31,7 +31,7 @@ TempSandbox {
   "deleteFileSync": [Function bound deleteFileSync],
   "destroySandbox": [Function bound destroySandbox],
   "destroySandboxSync": [Function bound destroySandboxSync],
-  "dir": "<TEMP_DIR>/temp-sandbox-sandbox/src/temp-sandbox.test.js-dir",
+  "dir": "<TEMP_DIR>/temp-sandbox-sandbox/src/temp-sandbox.test-dir",
   "getAllFilesHash": [Function bound getAllFilesHash],
   "getAllFilesHashSync": [Function bound getAllFilesHashSync],
   "getFileHash": [Function bound getFileHash],

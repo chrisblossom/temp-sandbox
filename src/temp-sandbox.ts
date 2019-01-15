@@ -1,5 +1,3 @@
-/* @flow */
-
 import path from 'path';
 import os from 'os';
 import del from 'del';
@@ -22,7 +20,7 @@ function getFileHash(contents: Buffer) {
     return hash;
 }
 
-function createFileParseContents(contents: mixed = '') {
+function createFileParseContents(contents: any = '') {
     let fileContents = contents;
 
     if (fileContents === null) {
@@ -52,16 +50,14 @@ function getRandomInteger(min: number = 1, max: number = 10000) {
     return randomInteger;
 }
 
-// eslint-disable-next-line flowtype/require-exact-type
 type Options = {
-    +randomDir?: boolean,
-    [any]: empty,
+    randomDir?: boolean;
 };
 
 class TempSandbox {
     dir: string;
 
-    constructor(options?: Options = {}) {
+    constructor(options: Options = {}) {
         const opts = {
             randomDir: false,
             ...options,
@@ -69,7 +65,14 @@ class TempSandbox {
 
         const tempDir = fs.realpathSync(os.tmpdir());
         const parent = parentModule();
+
         const relativeParent = path.relative(process.cwd(), parent);
+        const relativeParentParsed = path.parse(relativeParent);
+
+        const relateParentStrippedExt = path.join(
+            relativeParentParsed.dir,
+            relativeParentParsed.name,
+        );
 
         /**
          * create base directory based on package name
@@ -91,7 +94,7 @@ class TempSandbox {
         this.dir = path.resolve(
             tempDir,
             `${baseDir}-sandbox`,
-            `${relativeParent}-${dirId}`,
+            `${relateParentStrippedExt}-${dirId}`,
         );
 
         // Remove target temp directory if it already exists
@@ -102,34 +105,34 @@ class TempSandbox {
         // create sandbox directory
         makeDir.sync(this.dir);
 
-        (this: any).absolutePath = this.absolutePath.bind(this);
+        this.absolutePath = this.absolutePath.bind(this);
 
-        (this: any).createDir = this.createDir.bind(this);
-        (this: any).createDirSync = this.createDirSync.bind(this);
+        this.createDir = this.createDir.bind(this);
+        this.createDirSync = this.createDirSync.bind(this);
 
-        (this: any).createFile = this.createFile.bind(this);
-        (this: any).createFileSync = this.createFileSync.bind(this);
+        this.createFile = this.createFile.bind(this);
+        this.createFileSync = this.createFileSync.bind(this);
 
-        (this: any).deleteFile = this.deleteFile.bind(this);
-        (this: any).deleteFileSync = this.deleteFileSync.bind(this);
+        this.deleteFile = this.deleteFile.bind(this);
+        this.deleteFileSync = this.deleteFileSync.bind(this);
 
-        (this: any).readFile = this.readFile.bind(this);
-        (this: any).readFileSync = this.readFileSync.bind(this);
+        this.readFile = this.readFile.bind(this);
+        this.readFileSync = this.readFileSync.bind(this);
 
-        (this: any).getFileHash = this.getFileHash.bind(this);
-        (this: any).getFileHashSync = this.getFileHashSync.bind(this);
+        this.getFileHash = this.getFileHash.bind(this);
+        this.getFileHashSync = this.getFileHashSync.bind(this);
 
-        (this: any).getFileList = this.getFileList.bind(this);
-        (this: any).getFileListSync = this.getFileListSync.bind(this);
+        this.getFileList = this.getFileList.bind(this);
+        this.getFileListSync = this.getFileListSync.bind(this);
 
-        (this: any).getAllFilesHash = this.getAllFilesHash.bind(this);
-        (this: any).getAllFilesHashSync = this.getAllFilesHashSync.bind(this);
+        this.getAllFilesHash = this.getAllFilesHash.bind(this);
+        this.getAllFilesHashSync = this.getAllFilesHashSync.bind(this);
 
-        (this: any).clean = this.clean.bind(this);
-        (this: any).cleanSync = this.cleanSync.bind(this);
+        this.clean = this.clean.bind(this);
+        this.cleanSync = this.cleanSync.bind(this);
 
-        (this: any).destroySandbox = this.destroySandbox.bind(this);
-        (this: any).destroySandboxSync = this.destroySandboxSync.bind(this);
+        this.destroySandbox = this.destroySandbox.bind(this);
+        this.destroySandboxSync = this.destroySandboxSync.bind(this);
     }
 
     absolutePath(dir: string) {
@@ -152,7 +155,7 @@ class TempSandbox {
         return makeDir.sync(normalized);
     }
 
-    async createFile(file: string, contents: mixed = '') {
+    async createFile(file: string, contents: any = '') {
         const fileDir = path.parse(file).dir;
 
         if (fileDir) {
@@ -164,7 +167,7 @@ class TempSandbox {
         await writeFile(filePath, fileContents);
     }
 
-    createFileSync(file: string, contents: mixed = '') {
+    createFileSync(file: string, contents: any = '') {
         const fileDir = path.parse(file).dir;
 
         if (fileDir) {
@@ -213,7 +216,7 @@ class TempSandbox {
         return removed;
     }
 
-    async readFile(file: string) {
+    async readFile(file: string): Promise<unknown> {
         const filePath = this.absolutePath(file);
         let contents = await readFile(filePath, 'utf8');
 
@@ -226,7 +229,7 @@ class TempSandbox {
         return contents;
     }
 
-    readFileSync(file: string) {
+    readFileSync(file: string): unknown {
         const filePath = this.absolutePath(file);
 
         let contents = fs.readFileSync(filePath, 'utf8');
@@ -259,22 +262,22 @@ class TempSandbox {
     }
 
     async getFileList() {
-        const fileList = await readDirDeep(this.dir);
+        const fileList: Promise<string[]> = await readDirDeep(this.dir);
 
         return fileList;
     }
 
     getFileListSync() {
-        const fileList = readDirDeep.sync(this.dir);
+        const fileList: string[] = readDirDeep.sync(this.dir);
 
         return fileList;
     }
 
-    async getAllFilesHash() {
+    async getAllFilesHash(): Promise<{ [key: string]: string }> {
         const fileList = await this.getFileList();
 
-        const result = {};
-        const pending = fileList.map(async (file) => {
+        const result: { [key: string]: string } = {};
+        const pending = fileList.map(async (file: string) => {
             const hash = await this.getFileHash(file);
 
             result[file] = hash;
@@ -291,15 +294,18 @@ class TempSandbox {
         return sortedResult;
     }
 
-    getAllFilesHashSync() {
+    getAllFilesHashSync(): { [key: string]: string } {
         const fileList = this.getFileListSync();
-        const result = fileList.reduce((acc, file) => {
-            const fileHash = this.getFileHashSync(file);
-            return {
-                ...acc,
-                [file]: fileHash,
-            };
-        }, {});
+        const result = fileList.reduce(
+            (acc: { [key: string]: string }, file: string) => {
+                const fileHash = this.getFileHashSync(file);
+                return {
+                    ...acc,
+                    [file]: fileHash,
+                };
+            },
+            {},
+        );
 
         return result;
     }
@@ -351,7 +357,7 @@ class TempSandbox {
             if (key === 'dir') {
                 delete this.dir;
             } else {
-                // $FlowIssue
+                // @ts-ignore
                 this[key] = sandboxDestroyed;
             }
         }
@@ -366,7 +372,7 @@ class TempSandbox {
             if (key === 'dir') {
                 delete this.dir;
             } else {
-                // $FlowIssue
+                // @ts-ignore
                 this[key] = sandboxDestroyed;
             }
         }

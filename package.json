@@ -17,15 +17,13 @@
     "npm": ">=3.10.10"
   },
   "files": [
-    "dist/",
-    "flow-typed/"
+    "dist/"
   ],
   "main": "dist/temp-sandbox.js",
   "scripts": {
     "build": "backtrack build --production",
     "clean": "backtrack clean",
     "dev": "backtrack dev --development",
-    "flow": "backtrack flow",
     "format": "backtrack format",
     "git-pre-commit": "backtrack git-pre-commit",
     "git-pre-push": "backtrack git-pre-push",
@@ -36,12 +34,20 @@
     "test.ci": "backtrack test.ci",
     "test.ci-pretest": "backtrack test.ci-pretest",
     "test.update": "jest --updateSnapshot",
-    "test.watch": "jest --watch"
+    "test.watch": "jest --watch src",
+    "test.watch-e2e": "jest --watch e2e-tests",
+    "typescript": "backtrack typescript"
   },
   "devDependencies": {
     "@backtrack/core": "^0.1.23",
     "@backtrack/preset-node-module": "^0.5.2",
-    "flow-bin": "^0.80.0"
+    "@types/del": "^3.0.1",
+    "@types/jest": "^23.3.12",
+    "@types/make-dir": "^1.0.3",
+    "@types/node": "^10.12.18",
+    "@types/read-pkg-up": "^3.0.1",
+    "@types/util.promisify": "^1.0.0",
+    "typescript": "^3.2.2"
   },
   "dependencies": {
     "del": "^3.0.0",
