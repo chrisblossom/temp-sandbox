@@ -1,6 +1,6 @@
 {
   "name": "temp-sandbox",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "Create a predictable temporary directory that makes it easy to create, list, and delete files.",
   "keywords": [
     "sandbox",
