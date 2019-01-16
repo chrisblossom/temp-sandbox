@@ -45,6 +45,7 @@
     "@types/make-dir": "^1.0.3",
     "@types/node": "^10.12.18",
     "@types/read-pkg-up": "^3.0.1",
+    "@types/slash": "^2.0.0",
     "@types/util.promisify": "^1.0.0",
     "typescript": "^3.2.2"
   },
@@ -54,6 +55,7 @@
     "parent-module": "^1.0.0",
     "read-dir-deep": "^4.0.2",
     "read-pkg-up": "^4.0.0",
+    "slash": "^2.0.0",
     "util.promisify": "^1.0.0"
   }
 }

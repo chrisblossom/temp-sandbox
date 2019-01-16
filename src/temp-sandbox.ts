@@ -8,6 +8,7 @@ import parentModule from 'parent-module';
 import readPkgUp from 'read-pkg-up';
 import readDirDeep from 'read-dir-deep';
 import toPromise from 'util.promisify';
+import slash from 'slash';
 
 const writeFile = toPromise(fs.writeFile);
 const readFile = toPromise(fs.readFile);
@@ -141,7 +142,7 @@ class TempSandbox {
 
         const joinWithBase = path.join(this.dir, base);
 
-        return path.resolve(joinWithBase);
+        return slash(path.resolve(joinWithBase));
     }
 
     createDir(dir: string): Promise<string> {
@@ -289,7 +290,7 @@ class TempSandbox {
         const pending = fileList.map(async (file: string) => {
             const hash = await this.getFileHash(file);
 
-            const subPath = dir ? path.relative(dir, file) : file;
+            const subPath = dir ? slash(path.relative(dir, file)) : file;
 
             result[subPath] = hash;
         });
@@ -317,7 +318,7 @@ class TempSandbox {
         const result: { [key: string]: string } = fileList.reduce(
             (acc: { [key: string]: string }, file: string) => {
                 const fileHash = this.getFileHashSync(file);
-                const subPath = dir ? path.relative(dir, file) : file;
+                const subPath = dir ? slash(path.relative(dir, file)) : file;
 
                 return {
                     ...acc,
