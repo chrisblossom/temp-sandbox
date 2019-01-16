@@ -1,6 +1,7 @@
 import path from 'path';
 import os from 'os';
 import fs from 'fs';
+import slash from 'slash';
 
 const cwd = process.cwd();
 let sandbox: any;
@@ -22,9 +23,8 @@ test('uses calling package name as directory root', () => {
     process.chdir(dir);
 
     const tempDir = fs.realpathSync(os.tmpdir());
-    const expected = path.resolve(
-        tempDir,
-        'test-app-01-sandbox/create-sandbox-dir',
+    const expected = slash(
+        path.resolve(tempDir, 'test-app-01-sandbox/create-sandbox-dir'),
     );
 
     expect(fs.existsSync(expected)).toEqual(false);
@@ -40,9 +40,11 @@ test('uses calling package name as directory root with nested source', () => {
     process.chdir(dir);
 
     const tempDir = fs.realpathSync(os.tmpdir());
-    const expected = path.resolve(
-        tempDir,
-        'test-app-01-sandbox/nested/create-nested-sandbox-dir',
+    const expected = slash(
+        path.resolve(
+            tempDir,
+            'test-app-01-sandbox/nested/create-nested-sandbox-dir',
+        ),
     );
 
     expect(fs.existsSync(expected)).toEqual(false);
