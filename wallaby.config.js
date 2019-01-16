@@ -44,13 +44,16 @@ module.exports = (wallabyInitial) => {
                 { pattern: '.*', instrument: false },
                 { pattern: '**/__sandbox__/**/*', instrument: false },
                 { pattern: '**/__sandbox__/**/.*', instrument: false },
-                '**/*.+(js|jsx|ts|tsx)',
-                '!**/*.test.+(js|ts)',
+                '**/!(*.test).+(js|jsx|ts|tsx|mjs)',
                 { pattern: '**/.*', instrument: false },
-                { pattern: '**/*', instrument: false },
+                { pattern: '**/!(*.test).*', instrument: false },
             ],
 
-            tests: [...ignore, '!**/__sandbox__/**', '**/*.test.+(js|ts)'],
+            tests: [
+                ...ignore,
+                '!**/__sandbox__/**',
+                '**/*.test.+(js|jsx|ts|tsx|mjs)',
+            ],
 
             compilers: {
                 'src/**/*.+(js|jsx)': wallabyInitial.compilers.babel(),
@@ -105,7 +108,7 @@ module.exports = (wallabyInitial) => {
                     // eslint-disable-next-line no-empty
                 } catch (error) {}
                 process.env.NODE_ENV = 'test';
-                const jestConfig = require('./jest.config');
+                const jestConfig = require('./jest.config.js');
                 wallabySetup.testFramework.configure(jestConfig);
 
                 try {

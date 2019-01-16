@@ -26,7 +26,7 @@
             "src/temp-sandbox.ts": "ignoreUpdates",
             "tsconfig.declaration.json": "f29b914b471d9a5bbb231fa43c87235a8f44271edd11436f6ccec779e9e55957",
             "tsconfig.json": "afecd787ab1919b8d4f0f9873f1f3b2ef989b83fc7cc7c3348cefb0a219cd104",
-            "wallaby.config.js": "42d67f79ccf8a0d7ab342ad9698e59f29db895a1cc491bb55d9fafccdadbb24c"
+            "wallaby.config.js": "fd2e569c87eeabeb38ddd7c6f72e1e5db84821bebc479b1d64531df16a50cc37"
         }
     },
     "packageJson": {
