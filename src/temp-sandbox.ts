@@ -261,26 +261,37 @@ class TempSandbox {
         return fileHash;
     }
 
-    async getFileList(): Promise<string[]> {
-        const fileList = await readDirDeep(this.dir);
+    async getFileList(dir?: string): Promise<string[]> {
+        const readDir = dir ? this.absolutePath(dir) : this.dir;
+
+        const fileList = await readDirDeep(readDir);
 
         return fileList;
     }
 
-    getFileListSync(): string[] {
-        const fileList = readDirDeep.sync(this.dir);
+    getFileListSync(dir?: string): string[] {
+        const readDir = dir ? this.absolutePath(dir) : this.dir;
+        const fileList = readDirDeep.sync(readDir);
 
         return fileList;
     }
 
-    async getAllFilesHash(): Promise<{ [key: string]: string }> {
-        const fileList = await this.getFileList();
+    async getAllFilesHash(dir?: string): Promise<{ [key: string]: string }> {
+        const fileList = (await this.getFileList(dir)).map((file) => {
+            if (!dir) {
+                return file;
+            }
+
+            return path.join(dir, file);
+        });
 
         const result: { [key: string]: string } = {};
         const pending = fileList.map(async (file: string) => {
             const hash = await this.getFileHash(file);
 
-            result[file] = hash;
+            const subPath = dir ? path.relative(dir, file) : file;
+
+            result[subPath] = hash;
         });
 
         await Promise.all(pending);
@@ -294,20 +305,35 @@ class TempSandbox {
         return sortedResult;
     }
 
-    getAllFilesHashSync(): { [key: string]: string } {
-        const fileList = this.getFileListSync();
-        const result = fileList.reduce(
+    getAllFilesHashSync(dir?: string): { [key: string]: string } {
+        const fileList = this.getFileListSync(dir).map((file) => {
+            if (!dir) {
+                return file;
+            }
+
+            return path.join(dir, file);
+        });
+
+        const result: { [key: string]: string } = fileList.reduce(
             (acc: { [key: string]: string }, file: string) => {
                 const fileHash = this.getFileHashSync(file);
+                const subPath = dir ? path.relative(dir, file) : file;
+
                 return {
                     ...acc,
-                    [file]: fileHash,
+                    [subPath]: fileHash,
                 };
             },
             {},
         );
 
-        return result;
+        const sortedResult = Object.keys(result)
+            .sort()
+            .reduce((acc, item) => {
+                return { ...acc, [item]: result[item] };
+            }, {});
+
+        return sortedResult;
     }
 
     async clean(): Promise<string[]> {

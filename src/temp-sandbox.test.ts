@@ -2,20 +2,21 @@ import fs from 'fs';
 import path from 'path';
 import makeDir from 'make-dir';
 
-function TempSandbox(...args: any) {
-    jest.resetModules();
+class TempSandbox {
+    constructor(...args: any) {
+        jest.resetModules();
 
-    const TempSandboxActual = require('./temp-sandbox');
+        const TempSandboxActual = require('./temp-sandbox');
 
-    const tempSandBox = new TempSandboxActual(...args);
+        const tempSandBox = new TempSandboxActual(...args);
 
-    return tempSandBox;
+        return tempSandBox;
+    }
 }
 
 let sandbox: any;
 
 beforeEach(() => {
-    // @ts-ignore
     sandbox = new TempSandbox();
 });
 
@@ -46,7 +47,6 @@ test('cleans directory if already exists', () => {
 
     expect(fs.existsSync(file1)).toEqual(true);
 
-    // @ts-ignore
     sandbox = new TempSandbox();
 
     expect(fs.existsSync(file1)).toEqual(false);
@@ -56,7 +56,6 @@ describe('options', () => {
     test('handle randomDir', () => {
         sandbox.destroySandbox();
 
-        // @ts-ignore
         sandbox = new TempSandbox({ randomDir: true });
 
         const sandboxDirParsed = path.parse(sandbox.dir);
@@ -508,6 +507,40 @@ describe('getFileList', () => {
         });
     });
 
+    describe('return file list of sub dir', () => {
+        beforeEach(async () => {
+            await Promise.all([
+                sandbox.createFile('file1.js'),
+                sandbox.createFile('nested/file2.js'),
+                sandbox.createFile('a/b/c/file3.js'),
+                sandbox.createFile('a/c/file1.js'),
+            ]);
+        });
+
+        const checkResult = (allFileList: string[], subFileList: string[]) => {
+            expect(allFileList).toEqual([
+                'a/c/file1.js',
+                'a/b/c/file3.js',
+                'file1.js',
+                'nested/file2.js',
+            ]);
+
+            expect(subFileList).toEqual(['b/c/file3.js', 'c/file1.js']);
+        };
+
+        test('async', async () => {
+            const allFileList = await sandbox.getFileList();
+            const subFileList = await sandbox.getFileList('a');
+            checkResult(allFileList, subFileList);
+        });
+
+        test('sync', () => {
+            const allFileList = sandbox.getFileListSync();
+            const subFileList = sandbox.getFileListSync('a');
+            checkResult(allFileList, subFileList);
+        });
+    });
+
     describe('handles empty sandbox', () => {
         test('async', async () => {
             const files = await sandbox.getFileList();
@@ -602,6 +635,34 @@ describe('getAllFilesHash', () => {
 
         test('sync', () => {
             const filesHash = sandbox.getAllFilesHashSync();
+            checkResult(filesHash);
+        });
+    });
+
+    describe('returns all files in sub-dir', () => {
+        beforeEach(async () => {
+            await Promise.all([
+                sandbox.createFile('file1.js'),
+                sandbox.createFile('nested/file2.js'),
+                sandbox.createFile('a/b/c/file3.js'),
+                sandbox.createFile('a/c/file1.js'),
+            ]);
+        });
+
+        const checkResult = (filesHash: { [key: string]: string }) => {
+            expect(filesHash).toEqual({
+                'b/c/file3.js': 'd41d8cd98f00b204e9800998ecf8427e',
+                'c/file1.js': 'd41d8cd98f00b204e9800998ecf8427e',
+            });
+        };
+
+        test('async', async () => {
+            const filesHash = await sandbox.getAllFilesHash('a');
+            checkResult(filesHash);
+        });
+
+        test('sync', () => {
+            const filesHash = sandbox.getAllFilesHashSync('a');
             checkResult(filesHash);
         });
     });
@@ -795,14 +856,12 @@ describe('destroySandbox', () => {
 
         test('async', async () => {
             await sandbox.destroySandbox();
-            // @ts-ignore
             sandbox = new TempSandbox();
             checkResult();
         });
 
         test('sync', () => {
             sandbox.destroySandboxSync();
-            // @ts-ignore
             sandbox = new TempSandbox();
             checkResult();
         });
