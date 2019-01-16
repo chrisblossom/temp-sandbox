@@ -92,10 +92,12 @@ class TempSandbox {
         /**
          * Each temp directory will be unique to the file
          */
-        this.dir = path.resolve(
-            tempDir,
-            `${baseDir}-sandbox`,
-            `${relateParentStrippedExt}-${dirId}`,
+        this.dir = slash(
+            path.resolve(
+                tempDir,
+                `${baseDir}-sandbox`,
+                `${relateParentStrippedExt}-${dirId}`,
+            ),
         );
 
         // Remove target temp directory if it already exists
