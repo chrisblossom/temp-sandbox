@@ -139,8 +139,18 @@ class TempSandbox {
     }
 
     absolutePath(dir: string): string {
+        const absolute = path.resolve(this.dir, dir);
+        const relative = path.relative(this.dir, absolute);
+
+        const isOutside =
+            relative !== '' ? relative.split('..')[0] === '' : false;
+
+        if (isOutside) {
+            throw new Error(`${dir} is outside sandbox`);
+        }
+
         // Treat the directory as if it is the root of the filesystem
-        const base = path.join('/', dir);
+        const base = path.join('/', relative);
 
         const joinWithBase = path.join(this.dir, base);
 

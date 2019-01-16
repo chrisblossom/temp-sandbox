@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import makeDir from 'make-dir';
+import slash from 'slash';
 
 class TempSandbox {
     constructor(...args: any) {
@@ -72,22 +73,45 @@ describe('absolutePath', () => {
         const pathname = 'nested/path';
         const result = sandbox.absolutePath(pathname);
 
-        const expected = path.resolve(sandbox.dir, pathname);
+        const expected = slash(path.resolve(sandbox.dir, pathname));
         expect(result).toEqual(expected);
     });
 
     test('does not allow paths outside of sandbox dir', () => {
+        expect.hasAssertions();
         const pathname = '../';
-        const result = sandbox.absolutePath(pathname);
-
-        const expected = path.normalize(sandbox.dir);
-        expect(result).toEqual(expected);
+        try {
+            sandbox.absolutePath(pathname);
+        } catch (error) {
+            expect(error).toMatchSnapshot();
+        }
     });
 
     test('handles path outside of sandbox dir', () => {
-        const result = sandbox.absolutePath(process.cwd());
+        expect.hasAssertions();
 
-        const expected = path.normalize(sandbox.dir + path.sep + process.cwd());
+        try {
+            sandbox.absolutePath(process.cwd());
+        } catch (error) {
+            expect(error).toMatchSnapshot();
+        }
+    });
+
+    test('handles path inside of sandbox dir', () => {
+        const pathname = path.resolve(sandbox.dir, 'nested/path');
+
+        const result = sandbox.absolutePath(pathname);
+
+        expect(result).toEqual(slash(pathname));
+    });
+
+    test('handles .', () => {
+        const pathname = '.';
+
+        const result = sandbox.absolutePath(pathname);
+
+        const expected = slash(path.resolve(sandbox.dir, pathname));
+
         expect(result).toEqual(expected);
     });
 });

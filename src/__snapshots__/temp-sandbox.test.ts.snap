@@ -1,5 +1,9 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`absolutePath does not allow paths outside of sandbox dir 1`] = `[Error: ../ is outside sandbox]`;
+
+exports[`absolutePath handles path outside of sandbox dir 1`] = `[Error: <PROJECT_ROOT> is outside sandbox]`;
+
 exports[`createFile converts object to string async 1`] = `
 "{
     \\"packageJson\\": \\"test\\"
