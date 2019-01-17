@@ -2,9 +2,20 @@ import path from 'path';
 import os from 'os';
 import fs from 'fs';
 import slash from 'slash';
+import { del } from '../src/utils/del';
 
 const cwd = process.cwd();
 let sandbox: any;
+const tempDir = fs.realpathSync(os.tmpdir());
+const dir = path.resolve(__dirname, '__sandbox__/test-app-01');
+
+beforeEach(async () => {
+    const sandboxDir = path.resolve(tempDir, 'test-app-01-sandbox');
+
+    await del(sandboxDir, { force: true });
+
+    process.chdir(dir);
+});
 
 afterEach(async () => {
     if (
@@ -19,10 +30,6 @@ afterEach(async () => {
 });
 
 test('uses calling package name as directory root', () => {
-    const dir = path.resolve(__dirname, '__sandbox__/test-app-01');
-    process.chdir(dir);
-
-    const tempDir = fs.realpathSync(os.tmpdir());
     const expected = slash(
         path.resolve(tempDir, 'test-app-01-sandbox/create-sandbox-dir'),
     );
@@ -36,10 +43,6 @@ test('uses calling package name as directory root', () => {
 });
 
 test('uses calling package name as directory root with nested source', () => {
-    const dir = path.resolve(__dirname, '__sandbox__/test-app-01');
-    process.chdir(dir);
-
-    const tempDir = fs.realpathSync(os.tmpdir());
     const expected = slash(
         path.resolve(
             tempDir,
