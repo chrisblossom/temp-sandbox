@@ -1,8 +1,6 @@
-import os from 'os';
 import fs from 'fs';
 import path from 'path';
 import makeDir from 'make-dir';
-import slash from 'slash';
 
 class TempSandbox {
     constructor(...args: any) {
@@ -33,11 +31,6 @@ afterEach(async () => {
 });
 
 test('setups initial sandbox', () => {
-    // win32 fix for jest-serializer-path already escaped paths
-    if (os.platform() === 'win32') {
-        sandbox.dir = path.resolve(sandbox.dir);
-    }
-
     const dirExists = fs.statSync(sandbox.dir).isDirectory();
     expect(dirExists).toEqual(true);
     expect(sandbox).toMatchSnapshot();
@@ -80,7 +73,7 @@ describe('path.resolve', () => {
         const pathname = 'nested/path';
         const result = sandbox.path.resolve(pathname);
 
-        const expected = slash(path.resolve(sandbox.dir, pathname));
+        const expected = path.resolve(sandbox.dir, pathname);
         expect(result).toEqual(expected);
     });
 
@@ -109,7 +102,7 @@ describe('path.resolve', () => {
 
         const result = sandbox.path.resolve(pathname);
 
-        expect(result).toEqual(slash(pathname));
+        expect(result).toEqual(pathname);
     });
 
     test('handles .', () => {
@@ -117,7 +110,7 @@ describe('path.resolve', () => {
 
         const result = sandbox.path.resolve(pathname);
 
-        const expected = slash(path.resolve(sandbox.dir, pathname));
+        const expected = path.resolve(sandbox.dir, pathname);
 
         expect(result).toEqual(expected);
     });
@@ -129,7 +122,7 @@ describe('path.resolve', () => {
         const result = sandbox.absolutePath(pathname);
         sandbox.absolutePath(pathname);
 
-        const expected = slash(path.resolve(sandbox.dir, pathname));
+        const expected = path.resolve(sandbox.dir, pathname);
         expect(result).toEqual(expected);
 
         expect(consoleWarn.mock.calls).toEqual([
@@ -145,7 +138,7 @@ describe('path.relative', () => {
         const pathname = path.resolve(sandbox.dir, 'nested/path');
         const result = sandbox.path.relative(pathname);
 
-        expect(result).toEqual('nested/path');
+        expect(result).toEqual(path.normalize('nested/path'));
     });
 
     test('handles sandbox.dir', () => {
@@ -200,7 +193,7 @@ describe('createDir', () => {
         const checkResult = (result: string) => {
             const expectedDir = sandbox.path.resolve(pathname);
 
-            expect(result).toEqual('nested/path');
+            expect(result).toEqual(path.normalize('nested/path'));
             const dirExists = fs.statSync(expectedDir).isDirectory();
             expect(dirExists).toEqual(true);
         };
@@ -946,15 +939,17 @@ describe('clean', () => {
 
             // use set to ignore order
             expect(new Set(removed)).toEqual(
-                new Set([
-                    'a',
-                    'a/b',
-                    'a/b/c',
-                    'a/b/c/file3.js',
-                    'file1.js',
-                    'nested',
-                    'nested/file2.js',
-                ]),
+                new Set(
+                    [
+                        'a',
+                        'a/b',
+                        'a/b/c',
+                        'a/b/c/file3.js',
+                        'file1.js',
+                        'nested',
+                        'nested/file2.js',
+                    ].map(path.normalize),
+                ),
             );
         };
 

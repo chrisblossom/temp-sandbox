@@ -97,12 +97,10 @@ class TempSandbox {
         /**
          * Each temp directory will be unique to the file
          */
-        this.dir = slash(
-            path.resolve(
-                tempDir,
-                `${baseDir}-sandbox`,
-                `${relateParentStrippedExt}-${dirId}`,
-            ),
+        this.dir = path.resolve(
+            tempDir,
+            `${baseDir}-sandbox`,
+            `${relateParentStrippedExt}-${dirId}`,
         );
 
         // Remove target temp directory if it already exists
@@ -170,7 +168,7 @@ class TempSandbox {
 
             const joinWithBase = path.join(this.dir, base);
 
-            return slash(path.resolve(joinWithBase));
+            return path.resolve(joinWithBase);
         },
 
         relative: (dir1: string, dir2?: string): string => {
@@ -179,7 +177,7 @@ class TempSandbox {
 
             const relative = path.relative(from, to);
 
-            return slash(relative);
+            return relative;
         },
     };
 
@@ -379,7 +377,7 @@ class TempSandbox {
         const pending = fileList.map(async (file: string) => {
             const hash = await this.getFileHash(file);
 
-            const subPath = dir ? this.path.relative(dir, file) : file;
+            const subPath = dir ? slash(this.path.relative(dir, file)) : file;
 
             result[subPath] = hash;
         });
@@ -407,7 +405,9 @@ class TempSandbox {
         const result: { [key: string]: string } = fileList.reduce(
             (acc: { [key: string]: string }, file: string) => {
                 const fileHash = this.getFileHashSync(file);
-                const subPath = dir ? this.path.relative(dir, file) : file;
+                const subPath = dir
+                    ? slash(this.path.relative(dir, file))
+                    : file;
 
                 return {
                     ...acc,
@@ -451,11 +451,7 @@ class TempSandbox {
     }
 
     async destroySandbox(): Promise<string[]> {
-        const removed = (await del(this.dir, { force: true })).map(
-            (removedFiles) => {
-                return slash(removedFiles);
-            },
-        );
+        const removed = await del(this.dir, { force: true });
 
         for (const key of Object.keys(this)) {
             if (key === 'dir') {
@@ -471,11 +467,7 @@ class TempSandbox {
     }
 
     destroySandboxSync(): string[] {
-        const removed = del
-            .sync(this.dir, { force: true })
-            .map((removedFiles) => {
-                return slash(removedFiles);
-            });
+        const removed = del.sync(this.dir, { force: true });
 
         for (const key of Object.keys(this)) {
             if (key === 'dir') {
