@@ -116,6 +116,59 @@ describe('absolutePath', () => {
     });
 });
 
+describe('relativePath', () => {
+    test('handles nested', () => {
+        const pathname = path.resolve(sandbox.dir, 'nested/path');
+        const result = sandbox.relativePath(pathname);
+
+        expect(result).toEqual('nested/path');
+    });
+
+    test('handles sandbox.dir', () => {
+        const pathname = path.resolve(sandbox.dir);
+        const result = sandbox.relativePath(pathname);
+
+        expect(result).toEqual('');
+    });
+
+    test('handles relative inside relative', () => {
+        const pathname = path.resolve(sandbox.dir, 'nested/inside');
+
+        const result = sandbox.relativePath('nested', pathname);
+
+        expect(result).toEqual('inside');
+    });
+
+    test('handles base', () => {
+        const pathname = path.resolve(sandbox.dir, 'test.js');
+        const result = sandbox.relativePath(pathname);
+
+        expect(result).toEqual('test.js');
+    });
+
+    test('cannot be outside sandbox dir', () => {
+        expect.hasAssertions();
+
+        const pathname = path.resolve(__dirname, 'nested/path');
+        try {
+            sandbox.relativePath(pathname);
+        } catch (error) {
+            expect(error).toMatchSnapshot();
+        }
+    });
+
+    test('second dir cannot be outside sandbox dir', () => {
+        expect.hasAssertions();
+
+        const pathname = path.resolve(__dirname, 'nested/path');
+        try {
+            sandbox.relativePath(sandbox.dir, pathname);
+        } catch (error) {
+            expect(error).toMatchSnapshot();
+        }
+    });
+});
+
 describe('createDir', () => {
     describe('creates directory inside sandbox dir', () => {
         const pathname = 'nested/path';

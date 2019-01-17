@@ -110,6 +110,8 @@ class TempSandbox {
 
         this.absolutePath = this.absolutePath.bind(this);
 
+        this.relativePath = this.relativePath.bind(this);
+
         this.createDir = this.createDir.bind(this);
         this.createDirSync = this.createDirSync.bind(this);
 
@@ -155,6 +157,15 @@ class TempSandbox {
         const joinWithBase = path.join(this.dir, base);
 
         return slash(path.resolve(joinWithBase));
+    }
+
+    relativePath(dir1: string, dir2: string): string {
+        const from = dir2 ? this.absolutePath(dir1) : this.dir;
+        const to = dir2 ? this.absolutePath(dir2) : this.absolutePath(dir1);
+
+        const relative = path.relative(from, to);
+
+        return slash(relative);
     }
 
     createDir(dir: string): Promise<string> {
