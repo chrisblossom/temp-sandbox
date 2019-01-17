@@ -1,6 +1,5 @@
 import path from 'path';
 import os from 'os';
-import del from 'del';
 import fs from 'fs';
 import { createHash } from 'crypto';
 import makeDir from 'make-dir';
@@ -9,6 +8,7 @@ import readPkgUp from 'read-pkg-up';
 import readDirDeep from 'read-dir-deep';
 import toPromise from 'util.promisify';
 import slash from 'slash';
+import { del } from './utils/del';
 
 const writeFile = toPromise(fs.writeFile);
 const readFile = toPromise(fs.readFile);
@@ -361,33 +361,13 @@ class TempSandbox {
     }
 
     async clean(): Promise<string[]> {
-        try {
-            const removed = await del('**/*', {
-                root: this.dir,
-                cwd: this.dir,
-                dot: true,
-            });
+        const removed = await del('**/*', {
+            root: this.dir,
+            cwd: this.dir,
+            dot: true,
+        });
 
-            return removed;
-        } catch (error) {
-            /**
-             * Intermittently error code 'EINVAL' is being thrown here.
-             * Would be great to find out why
-             * Test will fail only if validating removed files.
-             * Retry once
-             */
-            if (error.code === 'EINVAL') {
-                const removed = del('**/*', {
-                    root: this.dir,
-                    cwd: this.dir,
-                    dot: true,
-                });
-
-                return removed;
-            }
-
-            throw error;
-        }
+        return removed;
     }
 
     cleanSync(): string[] {
