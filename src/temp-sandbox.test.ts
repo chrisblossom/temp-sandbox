@@ -28,7 +28,7 @@ afterEach(async () => {
         sandbox.destroySandbox &&
         sandbox.destroySandbox.name !== 'sandboxDestroyed'
     ) {
-        await sandbox.destroySandbox();
+        await sandbox.destroySandboxSync();
     }
 });
 
@@ -43,9 +43,10 @@ test('setups initial sandbox', () => {
     expect(sandbox).toMatchSnapshot();
 });
 
-test('cleans directory if already exists', () => {
+test('cleans directory if already exists', async () => {
     const sandboxDir = sandbox.dir;
-    sandbox.destroySandboxSync();
+
+    await sandbox.destroySandbox();
 
     makeDir.sync(sandboxDir);
 
@@ -60,8 +61,8 @@ test('cleans directory if already exists', () => {
 });
 
 describe('options', () => {
-    test('handle randomDir', () => {
-        sandbox.destroySandbox();
+    test('handle randomDir', async () => {
+        await sandbox.destroySandbox();
 
         sandbox = new TempSandbox({ randomDir: true });
 
