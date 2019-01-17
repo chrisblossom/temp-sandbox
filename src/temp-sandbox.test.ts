@@ -1,3 +1,4 @@
+import os from 'os';
 import fs from 'fs';
 import path from 'path';
 import makeDir from 'make-dir';
@@ -32,6 +33,11 @@ afterEach(async () => {
 });
 
 test('setups initial sandbox', () => {
+    // win32 fix for jest-serializer-path already escaped paths
+    if (os.platform() === 'win32') {
+        sandbox.dir = path.resolve(sandbox.dir);
+    }
+
     const dirExists = fs.statSync(sandbox.dir).isDirectory();
     expect(dirExists).toEqual(true);
     expect(sandbox).toMatchSnapshot();
@@ -193,7 +199,7 @@ describe('createDir', () => {
         const checkResult = (result: string) => {
             const expectedDir = sandbox.path.resolve(pathname);
 
-            expect(result).toEqual(expectedDir);
+            expect(result).toEqual('nested/path');
             const dirExists = fs.statSync(expectedDir).isDirectory();
             expect(dirExists).toEqual(true);
         };
@@ -405,7 +411,7 @@ describe('deleteFile', () => {
 
         const checkResult = (removed: string[]) => {
             expect(fs.existsSync(fullFilePath)).toEqual(false);
-            expect(removed).toEqual([fullFilePath]);
+            expect(removed).toEqual([file]);
         };
 
         test('async', async () => {
@@ -805,17 +811,15 @@ describe('clean', () => {
 
             // use set to ignore order
             expect(new Set(removed)).toEqual(
-                new Set(
-                    [
-                        'a',
-                        'a/b',
-                        'a/b/c',
-                        'a/b/c/file3.js',
-                        'file1.js',
-                        'nested',
-                        'nested/file2.js',
-                    ].map(sandbox.path.resolve),
-                ),
+                new Set([
+                    'a',
+                    'a/b',
+                    'a/b/c',
+                    'a/b/c/file3.js',
+                    'file1.js',
+                    'nested',
+                    'nested/file2.js',
+                ]),
             );
         };
 

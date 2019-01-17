@@ -186,15 +186,19 @@ class TempSandbox {
         return this.path.resolve(dir);
     }
 
-    createDir(dir: string): Promise<string> {
+    async createDir(dir: string): Promise<string> {
         const normalized = this.path.resolve(dir);
-        return makeDir(normalized);
+        const dirCreated = await makeDir(normalized);
+
+        return this.path.relative(dirCreated);
     }
 
     createDirSync(dir: string): string {
         const normalized = this.path.resolve(dir);
 
-        return makeDir.sync(normalized);
+        const dirCreated = makeDir.sync(normalized);
+
+        return this.path.relative(dirCreated);
     }
 
     async createFile(file: string, contents: any = ''): Promise<void> {
@@ -222,7 +226,7 @@ class TempSandbox {
         fs.writeFileSync(filePath, fileContents);
     }
 
-    deleteFile(file: string): Promise<string[]> {
+    async deleteFile(file: string): Promise<string[]> {
         const filePath = this.path.resolve(file);
 
         if (filePath === this.dir) {
@@ -231,13 +235,15 @@ class TempSandbox {
             );
         }
 
-        const removed = del(file, {
+        const removed = await del(file, {
             root: this.dir,
             cwd: this.dir,
             dot: true,
         });
 
-        return removed;
+        return removed.map((removedFiles) => {
+            return this.path.relative(removedFiles);
+        });
     }
 
     deleteFileSync(file: string): string[] {
@@ -255,7 +261,9 @@ class TempSandbox {
             dot: true,
         });
 
-        return removed;
+        return removed.map((removedFiles) => {
+            return this.path.relative(removedFiles);
+        });
     }
 
     async readFile(file: string): Promise<unknown> {
@@ -385,7 +393,9 @@ class TempSandbox {
             dot: true,
         });
 
-        return removed;
+        return removed.map((removedFiles) => {
+            return this.path.relative(removedFiles);
+        });
     }
 
     cleanSync(): string[] {
@@ -395,11 +405,17 @@ class TempSandbox {
             dot: true,
         });
 
-        return removed;
+        return removed.map((removedFiles) => {
+            return this.path.relative(removedFiles);
+        });
     }
 
     async destroySandbox(): Promise<string[]> {
-        const removed = await del(this.dir, { force: true });
+        const removed = (await del(this.dir, { force: true })).map(
+            (removedFiles) => {
+                return slash(removedFiles);
+            },
+        );
 
         for (const key of Object.keys(this)) {
             if (key === 'dir') {
@@ -415,7 +431,11 @@ class TempSandbox {
     }
 
     destroySandboxSync(): string[] {
-        const removed = del.sync(this.dir, { force: true });
+        const removed = del
+            .sync(this.dir, { force: true })
+            .map((removedFiles) => {
+                return slash(removedFiles);
+            });
 
         for (const key of Object.keys(this)) {
             if (key === 'dir') {
