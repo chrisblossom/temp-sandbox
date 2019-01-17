@@ -399,8 +399,8 @@ describe('createFile', () => {
     });
 });
 
-describe('deleteFile', () => {
-    describe('removes file', () => {
+describe('delete', () => {
+    describe('removes single file', () => {
         const file = 'file1.js';
         let fullFilePath: any;
 
@@ -416,12 +416,84 @@ describe('deleteFile', () => {
         };
 
         test('async', async () => {
-            const removed = await sandbox.deleteFile(file);
+            const removed = await sandbox.delete(file);
             checkResult(removed);
         });
 
         test('sync', () => {
-            const removed = sandbox.deleteFileSync(file);
+            const removed = sandbox.deleteSync(file);
+            checkResult(removed);
+        });
+    });
+
+    describe('removes multiple file', () => {
+        const files = ['file1.js', 'file2.js'];
+
+        beforeEach(async () => {
+            await Promise.all(
+                files.map(async (file) => {
+                    const fullFilePath = sandbox.path.resolve(file);
+                    expect(fs.existsSync(fullFilePath)).toEqual(false);
+
+                    await sandbox.createFile(file);
+                }),
+            );
+        });
+
+        const checkResult = (removed: string[]) => {
+            files.forEach((file) => {
+                const fullFilePath = sandbox.path.resolve(file);
+                expect(fs.existsSync(fullFilePath)).toEqual(false);
+            });
+
+            expect(removed).toEqual(files);
+        };
+
+        test('async', async () => {
+            const removed = await sandbox.delete(files);
+            checkResult(removed);
+        });
+
+        test('sync', () => {
+            const removed = sandbox.deleteSync(files);
+            checkResult(removed);
+        });
+    });
+
+    describe('removes directory', () => {
+        const files = [
+            'nested/file1.js',
+            'nested/file2.js',
+            'nested/deep/file3.js',
+        ];
+
+        beforeEach(async () => {
+            await Promise.all(
+                files.map(async (file) => {
+                    const fullFilePath = sandbox.path.resolve(file);
+                    expect(fs.existsSync(fullFilePath)).toEqual(false);
+                    await sandbox.createFile(file);
+                    expect(fs.existsSync(fullFilePath)).toEqual(true);
+                }),
+            );
+        });
+
+        const checkResult = (removed: string[]) => {
+            files.forEach((file) => {
+                const fullFilePath = sandbox.path.resolve(file);
+                expect(fs.existsSync(fullFilePath)).toEqual(false);
+            });
+
+            expect(removed).toEqual(['nested']);
+        };
+
+        test('async', async () => {
+            const removed = await sandbox.delete('nested');
+            checkResult(removed);
+        });
+
+        test('sync', () => {
+            const removed = sandbox.deleteSync('nested');
             checkResult(removed);
         });
     });
@@ -432,7 +504,7 @@ describe('deleteFile', () => {
         test('async', async () => {
             expect.hasAssertions();
             try {
-                await sandbox.deleteFile(file);
+                await sandbox.delete(file);
             } catch (error) {
                 expect(error).toMatchSnapshot();
             }
@@ -441,7 +513,29 @@ describe('deleteFile', () => {
         test('sync', () => {
             expect.hasAssertions();
             try {
-                sandbox.deleteFileSync(file);
+                sandbox.deleteSync(file);
+            } catch (error) {
+                expect(error).toMatchSnapshot();
+            }
+        });
+    });
+
+    describe('handles root with array', () => {
+        const file = ['file1.js', '.'];
+
+        test('async', async () => {
+            expect.hasAssertions();
+            try {
+                await sandbox.delete(file);
+            } catch (error) {
+                expect(error).toMatchSnapshot();
+            }
+        });
+
+        test('sync', () => {
+            expect.hasAssertions();
+            try {
+                sandbox.deleteSync(file);
             } catch (error) {
                 expect(error).toMatchSnapshot();
             }
@@ -452,7 +546,7 @@ describe('deleteFile', () => {
         test('async', async () => {
             expect.hasAssertions();
             try {
-                await sandbox.deleteFile();
+                await sandbox.delete();
             } catch (error) {
                 expect(error.message.includes('string')).toEqual(true);
                 expect(error.message.includes('undefined')).toEqual(true);
@@ -462,11 +556,51 @@ describe('deleteFile', () => {
         test('sync', () => {
             expect.hasAssertions();
             try {
-                sandbox.deleteFileSync();
+                sandbox.deleteSync();
             } catch (error) {
                 expect(error.message.includes('string')).toEqual(true);
                 expect(error.message.includes('undefined')).toEqual(true);
             }
+        });
+    });
+
+    describe('logs deleteFile(Sync) as deprecated once', () => {
+        const file = 'file1.js';
+        let fullFilePath: any;
+        let consoleWarn: any;
+
+        beforeEach(async () => {
+            consoleWarn = jest.spyOn(console, 'warn').mockImplementation();
+
+            await sandbox.createFile(file);
+            fullFilePath = sandbox.path.resolve(file);
+            expect(fs.existsSync(fullFilePath)).toEqual(true);
+        });
+
+        test('async', async () => {
+            const removed = await sandbox.deleteFile(file);
+            await sandbox.deleteFile(file);
+
+            expect(fs.existsSync(fullFilePath)).toEqual(false);
+            expect(removed).toEqual([file]);
+
+            expect(consoleWarn.mock.calls).toEqual([
+                ['deleteFile has been deprecated. Use sandbox.delete instead'],
+            ]);
+        });
+
+        test('sync', () => {
+            const removed = sandbox.deleteFileSync(file);
+            sandbox.deleteFileSync(file);
+
+            expect(fs.existsSync(fullFilePath)).toEqual(false);
+            expect(removed).toEqual([file]);
+
+            expect(consoleWarn.mock.calls).toEqual([
+                [
+                    'deleteFileSync has been deprecated. Use sandbox.deleteSync instead',
+                ],
+            ]);
         });
     });
 });

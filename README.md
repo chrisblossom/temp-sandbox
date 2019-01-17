@@ -60,9 +60,9 @@ test('create file', async () => {
     await sandbox.readFile('file1.js');
     sandbox.readFileSync('file1.js');
 
-    // Delete file <SANDBOX>/file1.js
-    await sandbox.deleteFile('file1.js');
-    sandbox.deleteFileSync('file1.js');
+    // Delete file/folders <SANDBOX>/file1.js
+    await sandbox.delete('file1.js');
+    sandbox.deleteSync('file1.js');
 
     // List all files inside sandbox
     const fileList = await sandbox.getFileList();

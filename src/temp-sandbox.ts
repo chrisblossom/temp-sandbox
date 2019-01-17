@@ -57,7 +57,11 @@ type Options = {
 
 class TempSandbox {
     public readonly dir: string;
-    private absolutePathDeprecationWarning: boolean;
+
+    private warnings: {
+        absolutePathDeprecated: boolean;
+        deleteFileDeprecated: boolean;
+    };
 
     constructor(options: Options = {}) {
         const opts = {
@@ -109,8 +113,12 @@ class TempSandbox {
         // create sandbox directory
         makeDir.sync(this.dir);
 
+        this.warnings = {
+            absolutePathDeprecated: false,
+            deleteFileDeprecated: false,
+        };
+
         this.absolutePath = this.absolutePath.bind(this);
-        this.absolutePathDeprecationWarning = false;
 
         this.path.relative = this.path.relative.bind(this);
         this.path.resolve = this.path.resolve.bind(this);
@@ -121,6 +129,8 @@ class TempSandbox {
         this.createFile = this.createFile.bind(this);
         this.createFileSync = this.createFileSync.bind(this);
 
+        this.delete = this.delete.bind(this);
+        this.deleteSync = this.deleteSync.bind(this);
         this.deleteFile = this.deleteFile.bind(this);
         this.deleteFileSync = this.deleteFileSync.bind(this);
 
@@ -174,13 +184,13 @@ class TempSandbox {
     };
 
     absolutePath(dir: string): string {
-        if (this.absolutePathDeprecationWarning === false) {
+        if (this.warnings.absolutePathDeprecated === false) {
             // eslint-disable-next-line no-console
             console.warn(
                 'absolutePath has been deprecated. Please use sandbox.path.resolve',
             );
 
-            this.absolutePathDeprecationWarning = true;
+            this.warnings.absolutePathDeprecated = true;
         }
 
         return this.path.resolve(dir);
@@ -226,16 +236,18 @@ class TempSandbox {
         fs.writeFileSync(filePath, fileContents);
     }
 
-    async deleteFile(file: string): Promise<string[]> {
-        const filePath = this.path.resolve(file);
+    async delete(patterns: string | string[]): Promise<string[]> {
+        (Array.isArray(patterns) ? patterns : [patterns]).forEach((pattern) => {
+            const filePath = this.path.resolve(pattern);
 
-        if (filePath === this.dir) {
-            throw new Error(
-                'Use sandbox.destroySandbox() to delete the sandbox.',
-            );
-        }
+            if (filePath === this.dir) {
+                throw new Error(
+                    'Use sandbox.destroySandbox() to delete the sandbox.',
+                );
+            }
+        });
 
-        const removed = await del(file, {
+        const removed = await del(patterns, {
             root: this.dir,
             cwd: this.dir,
             dot: true,
@@ -246,16 +258,31 @@ class TempSandbox {
         });
     }
 
-    deleteFileSync(file: string): string[] {
-        const filePath = this.path.resolve(file);
-
-        if (filePath === this.dir) {
-            throw new Error(
-                'Use sandbox.destroySandbox() to delete the sandbox.',
+    async deleteFile(patterns: string | string[]): Promise<string[]> {
+        if (this.warnings.deleteFileDeprecated === false) {
+            // eslint-disable-next-line no-console
+            console.warn(
+                'deleteFile has been deprecated. Use sandbox.delete instead',
             );
+
+            this.warnings.deleteFileDeprecated = true;
         }
 
-        const removed = del.sync(file, {
+        return this.delete(patterns);
+    }
+
+    deleteSync(patterns: string | string[]): string[] {
+        (Array.isArray(patterns) ? patterns : [patterns]).forEach((pattern) => {
+            const filePath = this.path.resolve(pattern);
+
+            if (filePath === this.dir) {
+                throw new Error(
+                    'Use sandbox.destroySandboxSync() to delete the sandbox.',
+                );
+            }
+        });
+
+        const removed = del.sync(patterns, {
             root: this.dir,
             cwd: this.dir,
             dot: true,
@@ -264,6 +291,19 @@ class TempSandbox {
         return removed.map((removedFiles) => {
             return this.path.relative(removedFiles);
         });
+    }
+
+    deleteFileSync(patterns: string | string[]): string[] {
+        if (this.warnings.deleteFileDeprecated === false) {
+            // eslint-disable-next-line no-console
+            console.warn(
+                'deleteFileSync has been deprecated. Use sandbox.deleteSync instead',
+            );
+
+            this.warnings.deleteFileDeprecated = true;
+        }
+
+        return this.deleteSync(patterns);
     }
 
     async readFile(file: string): Promise<unknown> {

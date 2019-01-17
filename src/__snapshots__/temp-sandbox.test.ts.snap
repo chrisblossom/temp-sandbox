@@ -14,9 +14,13 @@ exports[`createFile converts object to string sync 1`] = `
 "
 `;
 
-exports[`deleteFile handles root async 1`] = `[Error: Use sandbox.destroySandbox() to delete the sandbox.]`;
+exports[`delete handles root async 1`] = `[Error: Use sandbox.destroySandbox() to delete the sandbox.]`;
 
-exports[`deleteFile handles root sync 1`] = `[Error: Use sandbox.destroySandbox() to delete the sandbox.]`;
+exports[`delete handles root sync 1`] = `[Error: Use sandbox.destroySandboxSync() to delete the sandbox.]`;
+
+exports[`delete handles root with array async 1`] = `[Error: Use sandbox.destroySandbox() to delete the sandbox.]`;
+
+exports[`delete handles root with array sync 1`] = `[Error: Use sandbox.destroySandboxSync() to delete the sandbox.]`;
 
 exports[`path.relative cannot be outside sandbox dir 1`] = `[Error: <PROJECT_ROOT>/src/nested/path is outside sandbox]`;
 
@@ -29,15 +33,16 @@ exports[`path.resolve handles path outside of sandbox dir 1`] = `[Error: <PROJEC
 exports[`setups initial sandbox 1`] = `
 TempSandbox {
   "absolutePath": [Function bound absolutePath],
-  "absolutePathDeprecationWarning": false,
   "clean": [Function bound clean],
   "cleanSync": [Function bound cleanSync],
   "createDir": [Function bound createDir],
   "createDirSync": [Function bound createDirSync],
   "createFile": [Function bound createFile],
   "createFileSync": [Function bound createFileSync],
+  "delete": [Function bound delete],
   "deleteFile": [Function bound deleteFile],
   "deleteFileSync": [Function bound deleteFileSync],
+  "deleteSync": [Function bound deleteSync],
   "destroySandbox": [Function bound destroySandbox],
   "destroySandboxSync": [Function bound destroySandboxSync],
   "dir": "<TEMP_DIR>/temp-sandbox-sandbox/src/temp-sandbox.test-dir",
@@ -53,5 +58,9 @@ TempSandbox {
   },
   "readFile": [Function bound readFile],
   "readFileSync": [Function bound readFileSync],
+  "warnings": Object {
+    "absolutePathDeprecated": false,
+    "deleteFileDeprecated": false,
+  },
 }
 `;
