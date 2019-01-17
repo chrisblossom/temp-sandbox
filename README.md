@@ -39,22 +39,28 @@ afterAll(async () => {
 });
 
 test('create file', async () => {
-    // Get absolute path of SANDBOX/file1.js
-    sandbox.absolutePath('file1.js');
+    // Get absolute path of <SANDBOX>/file1.js
+    sandbox.path.resolve('file1.js');
 
-    // Create directory SANDBOX/nested/dir
+    // Get relative path of <SANDBOX>/nested/file1.js
+    sandbox.path.relative('<SANDBOX>/nested/file1.js');
+
+    // Get relative path of <SANDBOX>/nested/file1.js from <SANDBOX>/nested directory
+    sandbox.path.relative('nested', '<SANDBOX>/nested/file1.js'); // file1.js
+
+    // Create directory <SANDBOX>/nested/dir
     await sandbox.createDir('nested/dir');
     sandbox.createDirSync('nested/dir');
 
-    // Create file SANDBOX/file1.js with contents: // file1.js
+    // Create file <SANDBOX>/file1.js with contents: // file1.js
     await sandbox.createFile('file1.js', '// file1.js');
     sandbox.createFileSync('file1.js', '// file1.js');
 
-    // Read SANDBOX/file1.js contents
+    // Read <SANDBOX>/file1.js contents
     await sandbox.readFile('file1.js');
     sandbox.readFileSync('file1.js');
 
-    // Delete file SANDBOX/file1.js
+    // Delete file <SANDBOX>/file1.js
     await sandbox.deleteFile('file1.js');
     sandbox.deleteFileSync('file1.js');
 

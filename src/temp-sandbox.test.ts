@@ -68,10 +68,10 @@ describe('options', () => {
     });
 });
 
-describe('absolutePath', () => {
+describe('path.resolve', () => {
     test('returns absolute path relative to sandbox dir', () => {
         const pathname = 'nested/path';
-        const result = sandbox.absolutePath(pathname);
+        const result = sandbox.path.resolve(pathname);
 
         const expected = slash(path.resolve(sandbox.dir, pathname));
         expect(result).toEqual(expected);
@@ -81,7 +81,7 @@ describe('absolutePath', () => {
         expect.hasAssertions();
         const pathname = '../';
         try {
-            sandbox.absolutePath(pathname);
+            sandbox.path.resolve(pathname);
         } catch (error) {
             expect(error).toMatchSnapshot();
         }
@@ -91,7 +91,7 @@ describe('absolutePath', () => {
         expect.hasAssertions();
 
         try {
-            sandbox.absolutePath(process.cwd());
+            sandbox.path.resolve(process.cwd());
         } catch (error) {
             expect(error).toMatchSnapshot();
         }
@@ -100,7 +100,7 @@ describe('absolutePath', () => {
     test('handles path inside of sandbox dir', () => {
         const pathname = path.resolve(sandbox.dir, 'nested/path');
 
-        const result = sandbox.absolutePath(pathname);
+        const result = sandbox.path.resolve(pathname);
 
         expect(result).toEqual(slash(pathname));
     });
@@ -108,25 +108,42 @@ describe('absolutePath', () => {
     test('handles .', () => {
         const pathname = '.';
 
-        const result = sandbox.absolutePath(pathname);
+        const result = sandbox.path.resolve(pathname);
 
         const expected = slash(path.resolve(sandbox.dir, pathname));
 
         expect(result).toEqual(expected);
     });
+
+    test('logs absolutePath as deprecated once', () => {
+        const consoleWarn = jest.spyOn(console, 'warn').mockImplementation();
+
+        const pathname = 'nested/path';
+        const result = sandbox.absolutePath(pathname);
+        sandbox.absolutePath(pathname);
+
+        const expected = slash(path.resolve(sandbox.dir, pathname));
+        expect(result).toEqual(expected);
+
+        expect(consoleWarn.mock.calls).toEqual([
+            [
+                'absolutePath has been deprecated. Please use sandbox.path.resolve',
+            ],
+        ]);
+    });
 });
 
-describe('relativePath', () => {
+describe('path.relative', () => {
     test('handles nested', () => {
         const pathname = path.resolve(sandbox.dir, 'nested/path');
-        const result = sandbox.relativePath(pathname);
+        const result = sandbox.path.relative(pathname);
 
         expect(result).toEqual('nested/path');
     });
 
     test('handles sandbox.dir', () => {
         const pathname = path.resolve(sandbox.dir);
-        const result = sandbox.relativePath(pathname);
+        const result = sandbox.path.relative(pathname);
 
         expect(result).toEqual('');
     });
@@ -134,14 +151,14 @@ describe('relativePath', () => {
     test('handles relative inside relative', () => {
         const pathname = path.resolve(sandbox.dir, 'nested/inside');
 
-        const result = sandbox.relativePath('nested', pathname);
+        const result = sandbox.path.relative('nested', pathname);
 
         expect(result).toEqual('inside');
     });
 
     test('handles base', () => {
         const pathname = path.resolve(sandbox.dir, 'test.js');
-        const result = sandbox.relativePath(pathname);
+        const result = sandbox.path.relative(pathname);
 
         expect(result).toEqual('test.js');
     });
@@ -151,7 +168,7 @@ describe('relativePath', () => {
 
         const pathname = path.resolve(__dirname, 'nested/path');
         try {
-            sandbox.relativePath(pathname);
+            sandbox.path.relative(pathname);
         } catch (error) {
             expect(error).toMatchSnapshot();
         }
@@ -162,7 +179,7 @@ describe('relativePath', () => {
 
         const pathname = path.resolve(__dirname, 'nested/path');
         try {
-            sandbox.relativePath(sandbox.dir, pathname);
+            sandbox.path.relative(sandbox.dir, pathname);
         } catch (error) {
             expect(error).toMatchSnapshot();
         }
@@ -174,7 +191,7 @@ describe('createDir', () => {
         const pathname = 'nested/path';
 
         const checkResult = (result: string) => {
-            const expectedDir = sandbox.absolutePath(pathname);
+            const expectedDir = sandbox.path.resolve(pathname);
 
             expect(result).toEqual(expectedDir);
             const dirExists = fs.statSync(expectedDir).isDirectory();
@@ -201,7 +218,7 @@ describe('createFile', () => {
         const contents = '// file1.js';
 
         const checkResult = () => {
-            const fullFilePath = sandbox.absolutePath(file);
+            const fullFilePath = sandbox.path.resolve(file);
             const fileContents = fs.readFileSync(fullFilePath, 'utf8');
             expect(fileContents).toEqual(`${contents}\n`);
         };
@@ -222,8 +239,8 @@ describe('createFile', () => {
         const contents = '// nested/file1.js';
 
         const checkResult = () => {
-            const fullDirPath = sandbox.absolutePath('nested');
-            const fullFilePath = sandbox.absolutePath(file);
+            const fullDirPath = sandbox.path.resolve('nested');
+            const fullFilePath = sandbox.path.resolve(file);
 
             const dirExists = fs.statSync(fullDirPath).isDirectory();
             expect(dirExists).toEqual(true);
@@ -248,7 +265,7 @@ describe('createFile', () => {
         const contents = '// file1.js\n';
 
         const checkResult = () => {
-            const fullFilePath = sandbox.absolutePath(file);
+            const fullFilePath = sandbox.path.resolve(file);
 
             const fileContents = fs.readFileSync(fullFilePath, 'utf8');
             expect(fileContents).toEqual(contents);
@@ -270,7 +287,7 @@ describe('createFile', () => {
         const contents = '';
 
         const checkResult = () => {
-            const fullFilePath = sandbox.absolutePath(file);
+            const fullFilePath = sandbox.path.resolve(file);
             const fileContents = fs.readFileSync(fullFilePath, 'utf8');
             expect(fs.existsSync(fullFilePath)).toEqual(true);
             expect(fileContents).toEqual(contents);
@@ -291,7 +308,7 @@ describe('createFile', () => {
         const file = 'file1.js';
 
         const checkResult = () => {
-            const fullFilePath = sandbox.absolutePath(file);
+            const fullFilePath = sandbox.path.resolve(file);
 
             const fileContents = fs.readFileSync(fullFilePath, 'utf8');
             expect(fs.existsSync(fullFilePath)).toEqual(true);
@@ -314,7 +331,7 @@ describe('createFile', () => {
         const contents = null;
 
         const checkResult = () => {
-            const fullFilePath = sandbox.absolutePath(file);
+            const fullFilePath = sandbox.path.resolve(file);
             const fileContents = fs.readFileSync(fullFilePath, 'utf8');
             expect(fs.existsSync(fullFilePath)).toEqual(true);
             expect(fileContents).toEqual('');
@@ -336,7 +353,7 @@ describe('createFile', () => {
         const contents = 0;
 
         const checkResult = () => {
-            const fullFilePath = sandbox.absolutePath(file);
+            const fullFilePath = sandbox.path.resolve(file);
             const fileContents = fs.readFileSync(fullFilePath, 'utf8');
             expect(fs.existsSync(fullFilePath)).toEqual(true);
             expect(fileContents).toEqual(`${contents}\n`);
@@ -358,7 +375,7 @@ describe('createFile', () => {
         const contents = { packageJson: 'test' };
 
         const checkResult = () => {
-            const fullFilePath = sandbox.absolutePath(file);
+            const fullFilePath = sandbox.path.resolve(file);
             const fileContents = fs.readFileSync(fullFilePath, 'utf8');
             expect(fileContents).toMatchSnapshot();
         };
@@ -382,7 +399,7 @@ describe('deleteFile', () => {
 
         beforeEach(async () => {
             await sandbox.createFile(file);
-            fullFilePath = sandbox.absolutePath(file);
+            fullFilePath = sandbox.path.resolve(file);
             expect(fs.existsSync(fullFilePath)).toEqual(true);
         });
 
@@ -797,7 +814,7 @@ describe('clean', () => {
                         'file1.js',
                         'nested',
                         'nested/file2.js',
-                    ].map(sandbox.absolutePath),
+                    ].map(sandbox.path.resolve),
                 ),
             );
         };

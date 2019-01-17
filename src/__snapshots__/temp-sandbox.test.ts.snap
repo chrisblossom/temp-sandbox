@@ -1,9 +1,5 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`absolutePath does not allow paths outside of sandbox dir 1`] = `[Error: ../ is outside sandbox]`;
-
-exports[`absolutePath handles path outside of sandbox dir 1`] = `[Error: <PROJECT_ROOT> is outside sandbox]`;
-
 exports[`createFile converts object to string async 1`] = `
 "{
     \\"packageJson\\": \\"test\\"
@@ -22,13 +18,18 @@ exports[`deleteFile handles root async 1`] = `[Error: Use sandbox.destroySandbox
 
 exports[`deleteFile handles root sync 1`] = `[Error: Use sandbox.destroySandbox() to delete the sandbox.]`;
 
-exports[`relativePath cannot be outside sandbox dir 1`] = `[Error: <PROJECT_ROOT>/src/nested/path is outside sandbox]`;
+exports[`path.relative cannot be outside sandbox dir 1`] = `[Error: <PROJECT_ROOT>/src/nested/path is outside sandbox]`;
 
-exports[`relativePath second dir cannot be outside sandbox dir 1`] = `[Error: <PROJECT_ROOT>/src/nested/path is outside sandbox]`;
+exports[`path.relative second dir cannot be outside sandbox dir 1`] = `[Error: <PROJECT_ROOT>/src/nested/path is outside sandbox]`;
+
+exports[`path.resolve does not allow paths outside of sandbox dir 1`] = `[Error: ../ is outside sandbox]`;
+
+exports[`path.resolve handles path outside of sandbox dir 1`] = `[Error: <PROJECT_ROOT> is outside sandbox]`;
 
 exports[`setups initial sandbox 1`] = `
 TempSandbox {
   "absolutePath": [Function bound absolutePath],
+  "absolutePathDeprecationWarning": false,
   "clean": [Function bound clean],
   "cleanSync": [Function bound cleanSync],
   "createDir": [Function bound createDir],
@@ -46,8 +47,11 @@ TempSandbox {
   "getFileHashSync": [Function bound getFileHashSync],
   "getFileList": [Function bound getFileList],
   "getFileListSync": [Function bound getFileListSync],
+  "path": Object {
+    "relative": [Function bound relative],
+    "resolve": [Function bound resolve],
+  },
   "readFile": [Function bound readFile],
   "readFileSync": [Function bound readFileSync],
-  "relativePath": [Function bound relativePath],
 }
 `;

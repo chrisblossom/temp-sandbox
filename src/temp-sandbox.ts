@@ -56,7 +56,8 @@ type Options = {
 };
 
 class TempSandbox {
-    dir: string;
+    public readonly dir: string;
+    private absolutePathDeprecationWarning: boolean;
 
     constructor(options: Options = {}) {
         const opts = {
@@ -109,8 +110,10 @@ class TempSandbox {
         makeDir.sync(this.dir);
 
         this.absolutePath = this.absolutePath.bind(this);
+        this.absolutePathDeprecationWarning = false;
 
-        this.relativePath = this.relativePath.bind(this);
+        this.path.relative = this.path.relative.bind(this);
+        this.path.resolve = this.path.resolve.bind(this);
 
         this.createDir = this.createDir.bind(this);
         this.createDirSync = this.createDirSync.bind(this);
@@ -140,41 +143,56 @@ class TempSandbox {
         this.destroySandboxSync = this.destroySandboxSync.bind(this);
     }
 
+    path = {
+        resolve: (dir: string): string => {
+            const absolute = path.resolve(this.dir, dir);
+            const relative = path.relative(this.dir, absolute);
+
+            const isOutside =
+                relative !== '' ? relative.split('..')[0] === '' : false;
+
+            if (isOutside) {
+                throw new Error(`${dir} is outside sandbox`);
+            }
+
+            // Treat the directory as if it is the root of the filesystem
+            const base = path.join('/', relative);
+
+            const joinWithBase = path.join(this.dir, base);
+
+            return slash(path.resolve(joinWithBase));
+        },
+
+        relative: (dir1: string, dir2?: string): string => {
+            const from = dir2 ? this.path.resolve(dir1) : this.dir;
+            const to = dir2 ? this.path.resolve(dir2) : this.path.resolve(dir1);
+
+            const relative = path.relative(from, to);
+
+            return slash(relative);
+        },
+    };
+
     absolutePath(dir: string): string {
-        const absolute = path.resolve(this.dir, dir);
-        const relative = path.relative(this.dir, absolute);
+        if (this.absolutePathDeprecationWarning === false) {
+            // eslint-disable-next-line no-console
+            console.warn(
+                'absolutePath has been deprecated. Please use sandbox.path.resolve',
+            );
 
-        const isOutside =
-            relative !== '' ? relative.split('..')[0] === '' : false;
-
-        if (isOutside) {
-            throw new Error(`${dir} is outside sandbox`);
+            this.absolutePathDeprecationWarning = true;
         }
 
-        // Treat the directory as if it is the root of the filesystem
-        const base = path.join('/', relative);
-
-        const joinWithBase = path.join(this.dir, base);
-
-        return slash(path.resolve(joinWithBase));
-    }
-
-    relativePath(dir1: string, dir2: string): string {
-        const from = dir2 ? this.absolutePath(dir1) : this.dir;
-        const to = dir2 ? this.absolutePath(dir2) : this.absolutePath(dir1);
-
-        const relative = path.relative(from, to);
-
-        return slash(relative);
+        return this.path.resolve(dir);
     }
 
     createDir(dir: string): Promise<string> {
-        const normalized = this.absolutePath(dir);
+        const normalized = this.path.resolve(dir);
         return makeDir(normalized);
     }
 
     createDirSync(dir: string): string {
-        const normalized = this.absolutePath(dir);
+        const normalized = this.path.resolve(dir);
 
         return makeDir.sync(normalized);
     }
@@ -186,7 +204,7 @@ class TempSandbox {
             await this.createDir(fileDir);
         }
 
-        const filePath = this.absolutePath(file);
+        const filePath = this.path.resolve(file);
         const fileContents = createFileParseContents(contents);
         await writeFile(filePath, fileContents);
     }
@@ -198,14 +216,14 @@ class TempSandbox {
             this.createDirSync(fileDir);
         }
 
-        const filePath = this.absolutePath(file);
+        const filePath = this.path.resolve(file);
         const fileContents = createFileParseContents(contents);
 
         fs.writeFileSync(filePath, fileContents);
     }
 
     deleteFile(file: string): Promise<string[]> {
-        const filePath = this.absolutePath(file);
+        const filePath = this.path.resolve(file);
 
         if (filePath === this.dir) {
             throw new Error(
@@ -223,7 +241,7 @@ class TempSandbox {
     }
 
     deleteFileSync(file: string): string[] {
-        const filePath = this.absolutePath(file);
+        const filePath = this.path.resolve(file);
 
         if (filePath === this.dir) {
             throw new Error(
@@ -241,7 +259,7 @@ class TempSandbox {
     }
 
     async readFile(file: string): Promise<unknown> {
-        const filePath = this.absolutePath(file);
+        const filePath = this.path.resolve(file);
         let contents = await readFile(filePath, 'utf8');
 
         try {
@@ -254,7 +272,7 @@ class TempSandbox {
     }
 
     readFileSync(file: string): unknown {
-        const filePath = this.absolutePath(file);
+        const filePath = this.path.resolve(file);
 
         let contents = fs.readFileSync(filePath, 'utf8');
 
@@ -268,7 +286,7 @@ class TempSandbox {
     }
 
     async getFileHash(file: string): Promise<string> {
-        const filePath = this.absolutePath(file);
+        const filePath = this.path.resolve(file);
         const contents = await readFile(filePath);
 
         const fileHash = getFileHash(contents);
@@ -277,7 +295,7 @@ class TempSandbox {
     }
 
     getFileHashSync(file: string): string {
-        const filePath = this.absolutePath(file);
+        const filePath = this.path.resolve(file);
         const contents = fs.readFileSync(filePath);
 
         const fileHash = getFileHash(contents);
@@ -286,7 +304,7 @@ class TempSandbox {
     }
 
     async getFileList(dir?: string): Promise<string[]> {
-        const readDir = dir ? this.absolutePath(dir) : this.dir;
+        const readDir = dir ? this.path.resolve(dir) : this.dir;
 
         const fileList = await readDirDeep(readDir);
 
@@ -294,7 +312,7 @@ class TempSandbox {
     }
 
     getFileListSync(dir?: string): string[] {
-        const readDir = dir ? this.absolutePath(dir) : this.dir;
+        const readDir = dir ? this.path.resolve(dir) : this.dir;
         const fileList = readDirDeep.sync(readDir);
 
         return fileList;
@@ -313,7 +331,7 @@ class TempSandbox {
         const pending = fileList.map(async (file: string) => {
             const hash = await this.getFileHash(file);
 
-            const subPath = dir ? slash(path.relative(dir, file)) : file;
+            const subPath = dir ? this.path.relative(dir, file) : file;
 
             result[subPath] = hash;
         });
@@ -341,7 +359,7 @@ class TempSandbox {
         const result: { [key: string]: string } = fileList.reduce(
             (acc: { [key: string]: string }, file: string) => {
                 const fileHash = this.getFileHashSync(file);
-                const subPath = dir ? slash(path.relative(dir, file)) : file;
+                const subPath = dir ? this.path.relative(dir, file) : file;
 
                 return {
                     ...acc,
@@ -385,6 +403,7 @@ class TempSandbox {
 
         for (const key of Object.keys(this)) {
             if (key === 'dir') {
+                // @ts-ignore
                 delete this.dir;
             } else {
                 // @ts-ignore
@@ -400,6 +419,7 @@ class TempSandbox {
 
         for (const key of Object.keys(this)) {
             if (key === 'dir') {
+                // @ts-ignore
                 delete this.dir;
             } else {
                 // @ts-ignore
