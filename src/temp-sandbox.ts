@@ -6,9 +6,12 @@ import makeDir from 'make-dir';
 import parentModule from 'parent-module';
 import readPkgUp from 'read-pkg-up';
 import readDirDeep from 'read-dir-deep';
+import toPromise from 'util.promisify';
 import slash from 'slash';
-import { readFile, writeFile } from './utils/fs';
 import { del } from './utils/del';
+
+const writeFile = toPromise(fs.writeFile);
+const readFile = toPromise(fs.readFile);
 
 function getFileHash(contents: Buffer): string {
     const hash = createHash('md5')
