@@ -1,6 +1,6 @@
 {
   "name": "temp-sandbox",
-  "version": "1.0.13",
+  "version": "1.0.14",
   "description": "Create a predictable temporary directory that makes it easy to create, list, and delete files.",
   "keywords": [
     "sandbox",
@@ -46,7 +46,6 @@
     "@types/node": "^10.12.18",
     "@types/read-pkg-up": "^3.0.1",
     "@types/slash": "^2.0.0",
-    "@types/util.promisify": "^1.0.0",
     "typescript": "^3.2.2"
   },
   "dependencies": {
@@ -55,7 +54,6 @@
     "parent-module": "^1.0.0",
     "read-dir-deep": "^4.0.2",
     "read-pkg-up": "^4.0.0",
-    "slash": "^2.0.0",
-    "util.promisify": "^1.0.0"
+    "slash": "^2.0.0"
   }
 }
