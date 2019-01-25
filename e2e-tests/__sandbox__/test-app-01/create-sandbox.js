@@ -1,4 +1,4 @@
-import Sandbox from '../../../src/temp-sandbox';
+const Sandbox = require('../../../src/temp-sandbox');
 
 const sandbox = new Sandbox();
 

@@ -90,11 +90,8 @@ module.exports = (wallabyInitial) => {
 
                 try {
                     fs.symlinkSync(realModules, linkedModules, 'dir');
-                } catch (error) {
-                    if (error.code !== 'EEXIST') {
-                        throw error;
-                    }
-                }
+                    // eslint-disable-next-line no-empty
+                } catch (error) {}
 
                 /**
                  * https://github.com/wallabyjs/public/issues/1268#issuecomment-323237993
@@ -111,13 +108,13 @@ module.exports = (wallabyInitial) => {
                 const jestConfig = require('./jest.config.js');
                 wallabySetup.testFramework.configure(jestConfig);
 
-                try {
+                const setupFileExists = fs.existsSync('./wallaby.setup.js');
+                if (setupFileExists === true) {
                     /**
                      * Run custom wallaby setup script
                      */
                     require('./wallaby.setup.js')(wallabySetup);
-                    // eslint-disable-next-line no-empty
-                } catch (error) {}
+                }
             },
         },
     });

@@ -33,21 +33,21 @@
     "test": "backtrack test",
     "test.ci": "backtrack test.ci",
     "test.ci-pretest": "backtrack test.ci-pretest",
-    "test.update": "jest --updateSnapshot",
+    "test.update": "jest --update-snapshot",
     "test.watch": "jest --watch",
     "typescript": "backtrack typescript"
   },
   "devDependencies": {
     "@backtrack/core": "^0.1.23",
-    "@backtrack/preset-node-module": "^0.5.2",
+    "@backtrack/preset-node-module": "^0.5.5",
     "@types/del": "^3.0.1",
-    "@types/jest": "^23.3.12",
+    "@types/jest": "^23.3.13",
     "@types/make-dir": "^1.0.3",
     "@types/node": "^10.12.18",
     "@types/read-pkg-up": "^3.0.1",
     "@types/slash": "^2.0.0",
     "@types/util.promisify": "^1.0.0",
-    "typescript": "^3.2.2"
+    "typescript": "^3.2.4"
   },
   "dependencies": {
     "del": "^3.0.0",

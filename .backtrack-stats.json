@@ -22,11 +22,11 @@
             "README.md": "ignoreUpdates",
             "appveyor.yml": "251406424b8cb49b1a8858ef7eb521ae57856964625daed85b591692e8f98e15",
             "global.d.ts": "ignoreUpdates",
-            "jest.config.js": "89b921f7f379662d979221ac8124f85a5c2443a66f5d6922babf18e67b0f5727",
+            "jest.config.js": "593effcf28fda7ec31763c898d739f665436e659b7976864ce78885282136401",
             "src/temp-sandbox.ts": "ignoreUpdates",
             "tsconfig.declaration.json": "f29b914b471d9a5bbb231fa43c87235a8f44271edd11436f6ccec779e9e55957",
             "tsconfig.json": "afecd787ab1919b8d4f0f9873f1f3b2ef989b83fc7cc7c3348cefb0a219cd104",
-            "wallaby.config.js": "fd2e569c87eeabeb38ddd7c6f72e1e5db84821bebc479b1d64531df16a50cc37"
+            "wallaby.config.js": "2656c547b42344e044e4a04d211059882aa4ab616f46051bbf994a018be2b9ec"
         }
     },
     "packageJson": {
@@ -51,7 +51,7 @@
             "test": "backtrack test",
             "test.ci": "backtrack test.ci",
             "test.ci-pretest": "backtrack test.ci-pretest",
-            "test.update": "jest --updateSnapshot",
+            "test.update": "jest --update-snapshot",
             "test.watch": "jest --watch",
             "typescript": "backtrack typescript"
         }
