@@ -20,13 +20,13 @@ beforeEach(() => {
     sandbox = new TempSandbox();
 });
 
-afterEach(async () => {
+afterEach(() => {
     if (
         sandbox &&
         sandbox.destroySandbox &&
         sandbox.destroySandbox.name !== 'sandboxDestroyed'
     ) {
-        await sandbox.destroySandboxSync();
+        sandbox.destroySandboxSync();
     }
 });
 
