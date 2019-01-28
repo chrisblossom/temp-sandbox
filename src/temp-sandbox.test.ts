@@ -4,8 +4,6 @@ import makeDir from 'make-dir';
 
 class TempSandbox {
     constructor(...args: any) {
-        jest.resetModules();
-
         const TempSandboxActual = require('./temp-sandbox');
 
         const tempSandBox = new TempSandboxActual(...args);
@@ -17,7 +15,7 @@ class TempSandbox {
 let sandbox: any;
 
 beforeEach(() => {
-    sandbox = new TempSandbox();
+    sandbox = new TempSandbox({ randomDir: true });
 });
 
 afterEach(() => {
@@ -33,10 +31,10 @@ afterEach(() => {
 test('setups initial sandbox', () => {
     const dirExists = fs.statSync(sandbox.dir).isDirectory();
     expect(dirExists).toEqual(true);
-    expect(sandbox).toMatchSnapshot();
 });
 
 test('cleans directory if already exists', async () => {
+    sandbox = new TempSandbox({ randomDir: false });
     const sandboxDir = sandbox.dir;
 
     await sandbox.destroySandbox();

@@ -29,38 +29,3 @@ exports[`path.relative second dir cannot be outside sandbox dir 1`] = `[Error: <
 exports[`path.resolve does not allow paths outside of sandbox dir 1`] = `[Error: ../ is outside sandbox]`;
 
 exports[`path.resolve handles path outside of sandbox dir 1`] = `[Error: <PROJECT_ROOT> is outside sandbox]`;
-
-exports[`setups initial sandbox 1`] = `
-TempSandbox {
-  "absolutePath": [Function bound absolutePath],
-  "clean": [Function bound clean],
-  "cleanSync": [Function bound cleanSync],
-  "createDir": [Function bound createDir],
-  "createDirSync": [Function bound createDirSync],
-  "createFile": [Function bound createFile],
-  "createFileSync": [Function bound createFileSync],
-  "delete": [Function bound delete],
-  "deleteFile": [Function bound deleteFile],
-  "deleteFileSync": [Function bound deleteFileSync],
-  "deleteSync": [Function bound deleteSync],
-  "destroySandbox": [Function bound destroySandbox],
-  "destroySandboxSync": [Function bound destroySandboxSync],
-  "dir": "<TEMP_DIR>/temp-sandbox-sandbox/src/temp-sandbox.test-dir",
-  "getAllFilesHash": [Function bound getAllFilesHash],
-  "getAllFilesHashSync": [Function bound getAllFilesHashSync],
-  "getFileHash": [Function bound getFileHash],
-  "getFileHashSync": [Function bound getFileHashSync],
-  "getFileList": [Function bound getFileList],
-  "getFileListSync": [Function bound getFileListSync],
-  "path": Object {
-    "relative": [Function bound relative],
-    "resolve": [Function bound resolve],
-  },
-  "readFile": [Function bound readFile],
-  "readFileSync": [Function bound readFileSync],
-  "warnings": Object {
-    "absolutePathDeprecated": false,
-    "deleteFileDeprecated": false,
-  },
-}
-`;
