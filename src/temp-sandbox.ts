@@ -45,7 +45,7 @@ function sandboxDestroyed() {
 }
 
 // https://stackoverflow.com/a/1527820
-function getRandomInteger(min: number = 1, max: number = 10000) {
+function getRandomInteger(min: number = 1, max: number = 100) {
     const randomInteger = Math.floor(Math.random() * (max - min + 1)) + min;
 
     return randomInteger;
