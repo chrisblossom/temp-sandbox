@@ -83,7 +83,7 @@ class TempSandbox {
         /**
          * create base directory based on package name
          */
-        const baseDir = readPkgUp
+        const baseDirId = readPkgUp
             .sync({
                 cwd: parent,
                 normalize: false,
@@ -94,14 +94,12 @@ class TempSandbox {
         const dirId =
             opts.randomDir === false ? 'dir' : getRandomInteger().toString();
 
+        const baseDir = path.resolve(tempDir, `${baseDirId}-sandbox`);
+
         /**
          * Each temp directory will be unique to the file
          */
-        this.dir = path.resolve(
-            tempDir,
-            `${baseDir}-sandbox`,
-            `${relateParentStrippedExt}-${dirId}`,
-        );
+        this.dir = path.resolve(baseDir, `${relateParentStrippedExt}-${dirId}`);
 
         // Remove target temp directory if it already exists
         if (fs.existsSync(this.dir)) {
@@ -249,6 +247,7 @@ class TempSandbox {
             root: this.dir,
             cwd: this.dir,
             dot: true,
+            force: true,
         });
 
         return removed.map((removedFiles) => {
@@ -284,6 +283,7 @@ class TempSandbox {
             root: this.dir,
             cwd: this.dir,
             dot: true,
+            force: true,
         });
 
         return removed.map((removedFiles) => {
@@ -431,6 +431,7 @@ class TempSandbox {
             root: this.dir,
             cwd: this.dir,
             dot: true,
+            force: true,
         });
 
         return removed.map((removedFiles) => {
@@ -443,6 +444,7 @@ class TempSandbox {
             root: this.dir,
             cwd: this.dir,
             dot: true,
+            force: true,
         });
 
         return removed.map((removedFiles) => {
