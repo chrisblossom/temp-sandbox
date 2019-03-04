@@ -22,7 +22,10 @@ const packageId = '@backtrack/preset-jest';
 const jest = {
     testEnvironment: 'node',
     collectCoverage: false,
-    coveragePathIgnorePatterns: ['<rootDir>/(.*/?)__sandbox__'],
+    coveragePathIgnorePatterns: [
+        '<rootDir>/(.*/?)__sandbox__',
+        '<rootDir>/jest.*.(js|ts|mjs)',
+    ],
     testPathIgnorePatterns: ['<rootDir>/(.*/?)__sandbox__'],
     snapshotSerializers: [
         pkg.resolve(packageId, 'jest-serializer-path'),
@@ -58,28 +61,62 @@ const jest = {
     restoreMocks: true,
 };
 
-// https://jestjs.io/docs/en/configuration#setupfiles-array
-const jestSetupExists = fs.existsSync('./jest.setup.js');
-if (jestSetupExists === true) {
-    jest.setupFiles = ['<rootDir>/jest.setup.js'];
+function getFile(file) {
+    const jsFile = `${file}.js`;
+    const jsFileExists = fs.existsSync(jsFile);
+
+    if (jsFileExists) {
+        return jsFile;
+    }
+
+    const tsFile = `${file}.ts`;
+    const tsFileExists = fs.existsSync(tsFile);
+
+    if (tsFileExists) {
+        return tsFile;
+    }
+
+    return null;
 }
 
-// https://jestjs.io/docs/en/configuration#setupfilesafterenv-array
-const jestSetupTestExists = fs.existsSync('./jest.setup-test.js');
-if (jestSetupTestExists === true) {
-    jest.setupFilesAfterEnv = ['<rootDir>/jest.setup-test.js'];
+/**
+ * globalSetup: ran once before all tests
+ *
+ * https://jestjs.io/docs/en/configuration#globalsetup-string
+ */
+const globalSetup = getFile('jest.global-setup');
+if (globalSetup !== null) {
+    jest.globalSetup = `<rootDir>/${globalSetup}`;
 }
 
-// https://jestjs.io/docs/en/configuration#globalsetup-string
-const jestGlobalSetupExists = fs.existsSync('./jest.initialize.js');
-if (jestGlobalSetupExists === true) {
-    jest.globalTeardown = '<rootDir>/jest.initialize.js';
+/**
+ * setupFiles: ran once per test file before all tests
+ *
+ * https://jestjs.io/docs/en/configuration#setupfiles-array
+ */
+const setupFiles = getFile('jest.setup-test-file');
+if (setupFiles !== null) {
+    jest.setupFiles = [`<rootDir>/${setupFiles}`];
 }
 
-// https://jestjs.io/docs/en/configuration#globalteardown-string
-const jestGlobalTeardownExists = fs.existsSync('./jest.teardown.js');
-if (jestGlobalTeardownExists === true) {
-    jest.globalTeardown = '<rootDir>/jest.teardown.js';
+/**
+ * setupFilesAfterEnv: ran before each test
+ *
+ * https://jestjs.io/docs/en/configuration#setupfilesafterenv-array
+ */
+const setupFilesAfterEnv = getFile('jest.setup-test');
+if (setupFilesAfterEnv !== null) {
+    jest.setupFilesAfterEnv = [`<rootDir>/${setupFilesAfterEnv}`];
+}
+
+/**
+ * globalTeardown: ran once after all tests
+ *
+ * https://jestjs.io/docs/en/configuration#globalteardown-string
+ */
+const globalTeardown = getFile('jest.global-teardown');
+if (globalTeardown !== null) {
+    jest.globalTeardown = `<rootDir>/${globalTeardown}`;
 }
 
 module.exports = configManager({

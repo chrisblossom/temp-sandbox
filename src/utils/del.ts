@@ -1,4 +1,4 @@
-import delActual, { Options } from 'del';
+import delActual, { sync as DelSync, Options } from 'del';
 
 function sleep(ms: number) {
     return new Promise((resolve) => {
@@ -46,6 +46,6 @@ async function del(
 }
 
 // EINVAL does not happen async
-del.sync = delActual.sync;
+del.sync = DelSync;
 
 export { del };

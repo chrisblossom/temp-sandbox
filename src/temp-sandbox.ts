@@ -2,7 +2,7 @@ import path from 'path';
 import os from 'os';
 import fs from 'fs';
 import { createHash } from 'crypto';
-import makeDir from 'make-dir';
+import makeDir, { sync as makeDirSync } from 'make-dir';
 import parentModule from 'parent-module';
 import readPkgUp from 'read-pkg-up';
 import readDirDeep from 'read-dir-deep';
@@ -107,7 +107,7 @@ class TempSandbox {
         }
 
         // create sandbox directory
-        makeDir.sync(this.dir);
+        makeDirSync(this.dir);
 
         this.warnings = {
             absolutePathDeprecated: false,
@@ -202,7 +202,7 @@ class TempSandbox {
     createDirSync(dir: string): string {
         const normalized = this.path.resolve(dir);
 
-        const dirCreated = makeDir.sync(normalized);
+        const dirCreated = makeDirSync(normalized);
 
         return this.path.relative(dirCreated);
     }
@@ -286,7 +286,7 @@ class TempSandbox {
             force: true,
         });
 
-        return removed.map((removedFiles) => {
+        return removed.map((removedFiles: string) => {
             return this.path.relative(removedFiles);
         });
     }
@@ -447,7 +447,7 @@ class TempSandbox {
             force: true,
         });
 
-        return removed.map((removedFiles) => {
+        return removed.map((removedFiles: string) => {
             return this.path.relative(removedFiles);
         });
     }

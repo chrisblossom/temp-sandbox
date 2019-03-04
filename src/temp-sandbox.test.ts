@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import makeDir from 'make-dir';
+import { sync as makeDirSync } from 'make-dir';
 
 class TempSandbox {
     constructor(...args: any) {
@@ -39,7 +39,7 @@ test('cleans directory if already exists', async () => {
 
     await sandbox.destroySandbox();
 
-    makeDir.sync(sandboxDir);
+    makeDirSync(sandboxDir);
 
     const file1 = path.resolve(sandboxDir, 'file1.js');
     fs.writeFileSync(file1, '');
