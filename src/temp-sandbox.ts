@@ -5,7 +5,7 @@ import { createHash } from 'crypto';
 import makeDir, { sync as makeDirSync } from 'make-dir';
 import parentModule from 'parent-module';
 import readPkgUp from 'read-pkg-up';
-import readDirDeep from 'read-dir-deep';
+import { readDirDeep, readDirDeepSync } from 'read-dir-deep';
 import toPromise from 'util.promisify';
 import slash from 'slash';
 import { del } from './utils/del';
@@ -359,7 +359,7 @@ class TempSandbox {
 
     getFileListSync(dir?: string): string[] {
         const readDir = dir ? this.path.resolve(dir) : this.dir;
-        const fileList = readDirDeep.sync(readDir);
+        const fileList = readDirDeepSync(readDir);
 
         return fileList;
     }

@@ -38,20 +38,20 @@
     "typescript": "backtrack typescript"
   },
   "devDependencies": {
-    "@backtrack/core": "^0.1.25",
+    "@backtrack/core": "^0.1.27",
     "@backtrack/preset-node": "^0.1.2",
-    "@types/jest": "^24.0.9",
-    "@types/node": "^11.10.4",
+    "@types/jest": "^24.0.11",
+    "@types/node": "^11.13.6",
     "@types/read-pkg-up": "^3.0.1",
     "@types/slash": "^2.0.0",
     "@types/util.promisify": "^1.0.0",
-    "typescript": "^3.3.3333"
+    "typescript": "^3.4.4"
   },
   "dependencies": {
-    "del": "^4.0.0",
+    "del": "^4.1.0",
     "make-dir": "^2.1.0",
-    "parent-module": "^1.0.0",
-    "read-dir-deep": "^4.0.3",
+    "parent-module": "^1.0.1",
+    "read-dir-deep": "^5.0.0",
     "read-pkg-up": "^4.0.0",
     "slash": "^2.0.0",
     "util.promisify": "^1.0.0"
