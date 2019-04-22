@@ -4,7 +4,7 @@ import { sync as makeDirSync } from 'make-dir';
 
 class TempSandbox {
     constructor(...args: any) {
-        const TempSandboxActual = require('./temp-sandbox');
+        const TempSandboxActual = require('./temp-sandbox').TempSandbox;
 
         const tempSandBox = new TempSandboxActual(...args);
 

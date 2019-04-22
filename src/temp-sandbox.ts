@@ -485,4 +485,4 @@ class TempSandbox {
     }
 }
 
-export default TempSandbox;
+export { TempSandbox };

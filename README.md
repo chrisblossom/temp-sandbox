@@ -17,7 +17,7 @@ Create a predictable temporary directory that makes it easy to create, list, and
 
 ```js
 // index.test.js
-import TempSandbox from 'temp-sandbox';
+import { TempSandbox } from 'temp-sandbox';
 
 // Create sandbox with a predictable directory name
 const sandbox = new TempSandbox();
