@@ -70,7 +70,8 @@ class TempSandbox {
         };
 
         const tempDir = fs.realpathSync(os.tmpdir());
-        const parent = parentModule();
+        const parent =
+            parentModule() || `PARENT-NOT-FOUND-${getRandomInteger()}`;
 
         const relativeParent = path.relative(process.cwd(), parent);
         const relativeParentParsed = path.parse(relativeParent);

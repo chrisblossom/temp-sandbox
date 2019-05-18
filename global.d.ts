@@ -1,1 +1,0 @@
-declare module 'parent-module';
