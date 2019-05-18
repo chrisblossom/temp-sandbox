@@ -9,7 +9,7 @@ function sleep(ms: number) {
 async function del(
     patterns: string | ReadonlyArray<string>,
     options?: Options,
-): Promise<string[]> {
+): ReturnType<typeof delActual> {
     try {
         const removed = await delActual(patterns, options);
 
