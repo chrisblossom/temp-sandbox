@@ -6,12 +6,12 @@ import makeDir, { sync as makeDirSync } from 'make-dir';
 import parentModule from 'parent-module';
 import readPkgUp from 'read-pkg-up';
 import { readDirDeep, readDirDeepSync } from 'read-dir-deep';
-import toPromise from 'util.promisify';
+import { promisify } from 'util';
 import slash from 'slash';
 import { del } from './utils/del';
 
-const writeFile = toPromise(fs.writeFile);
-const readFile = toPromise(fs.readFile);
+const writeFile = promisify(fs.writeFile);
+const readFile = promisify(fs.readFile);
 
 function getFileHash(contents: Buffer): string {
     const hash = createHash('md5')
@@ -83,13 +83,21 @@ class TempSandbox {
         /**
          * create base directory based on package name
          */
-        const baseDirId = readPkgUp
-            .sync({
-                cwd: parent,
-                normalize: false,
-            })
-            .pkg.name // replace special characters for directory name
-            .replace(/[^a-zA-Z0-9]/g, '-');
+        const packageJson = readPkgUp.sync({
+            cwd: parent,
+            normalize: false,
+        });
+
+        const baseDirId =
+            packageJson && packageJson.package && packageJson.package.name
+                ? packageJson.package.name
+                      // replace special characters for directory name
+                      .replace(/[^a-zA-Z0-9]/g, '-')
+                : null;
+
+        if (baseDirId === null) {
+            throw new Error('package name not found');
+        }
 
         const dirId =
             opts.randomDir === false ? 'dir' : getRandomInteger().toString();

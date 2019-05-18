@@ -7,11 +7,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+-   Breaking: Remove node 6 support
+
 ## [2.0.0] - 2019-04-22
 
 ### Changed
 
--   (breaking): replace default export with named export `TempSandbox`
+-   Breaking: replace default export with named export `TempSandbox`
 
 ## [1.0.18] - 2019-04-22
 
