@@ -1,9 +1,12 @@
+/* eslint-disable jest/prefer-inline-snapshots */
+
 import fs from 'fs';
 import path from 'path';
 import { sync as makeDirSync } from 'make-dir';
 
+// eslint-disable-next-line @typescript-eslint/no-extraneous-class
 class TempSandbox {
-	constructor(...args: any) {
+	public constructor(...args: any) {
 		const TempSandboxActual = require('./temp-sandbox').TempSandbox;
 
 		const tempSandBox = new TempSandboxActual(...args);
@@ -539,8 +542,8 @@ describe('delete', () => {
 			try {
 				await sandbox.delete();
 			} catch (error) {
-				expect(error.message.includes('string')).toEqual(true);
-				expect(error.message.includes('undefined')).toEqual(true);
+				expect(error.message).toContain('string');
+				expect(error.message).toContain('undefined');
 			}
 		});
 
@@ -549,8 +552,8 @@ describe('delete', () => {
 			try {
 				sandbox.deleteSync();
 			} catch (error) {
-				expect(error.message.includes('string')).toEqual(true);
-				expect(error.message.includes('undefined')).toEqual(true);
+				expect(error.message).toContain('string');
+				expect(error.message).toContain('undefined');
 			}
 		});
 	});
@@ -995,12 +998,12 @@ describe('destroySandbox', () => {
 				.concat(
 					Object.getOwnPropertySymbols(obj).map((s) => s.toString()),
 				)
-				.sort()
+				.sort((a, b) => a.localeCompare(b))
 				.filter(
 					(p, i, arr) =>
 						p !== 'constructor' && // not the constructor
 						(i === 0 || p !== arr[i - 1]) && // not overriding in this prototype
-						props.indexOf(p) === -1, // not overridden in a child
+						!props.includes(p), // not overridden in a child
 				);
 			props = props.concat(l);
 		} while (
@@ -1009,7 +1012,7 @@ describe('destroySandbox', () => {
 		);
 
 		return props;
-		/* eslint-enable */
+		/* eslint-enable no-param-reassign,no-cond-assign,no-loop-func */
 	};
 
 	describe('removes sandbox directory and removes this references', () => {
@@ -1040,9 +1043,9 @@ describe('destroySandbox', () => {
 					// ensure test throws error
 					expect(method).toEqual(`${method} failed to throw`);
 				} catch (error) {
-					expect(
-						error.message.includes('sandbox has been destroyed'),
-					).toEqual(true);
+					expect(error.message).toContain(
+						'sandbox has been destroyed',
+					);
 				}
 			});
 		};

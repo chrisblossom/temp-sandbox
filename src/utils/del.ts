@@ -1,13 +1,13 @@
 import delActual, { sync as DelSync, Options } from 'del';
 
-function sleep(ms: number) {
-	return new Promise((resolve) => {
+async function waitForMs(ms: number): Promise<void> {
+	return new Promise((resolve): void => {
 		setTimeout(resolve, ms);
 	});
 }
 
 async function del(
-	patterns: string | ReadonlyArray<string>,
+	patterns: string | readonly string[],
 	options?: Options,
 ): ReturnType<typeof delActual> {
 	try {
@@ -22,14 +22,14 @@ async function del(
 		 * Retry twice with 100ms between each try
 		 */
 		if (error.code === 'EINVAL') {
-			await sleep(100);
+			await waitForMs(100);
 
 			try {
 				const removed = await delActual(patterns, options);
 
 				return removed;
 			} catch (error2) {
-				await sleep(100);
+				await waitForMs(100);
 
 				if (error2.code === 'EINVAL') {
 					const removed = await delActual(patterns, options);

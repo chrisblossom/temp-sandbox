@@ -2,11 +2,11 @@ import path from 'path';
 import os from 'os';
 import fs from 'fs';
 import { createHash } from 'crypto';
+import { promisify } from 'util';
 import makeDir, { sync as makeDirSync } from 'make-dir';
 import parentModule from 'parent-module';
 import readPkgUp from 'read-pkg-up';
 import { readDirDeep, readDirDeepSync } from 'read-dir-deep';
-import { promisify } from 'util';
 import slash from 'slash';
 import { del } from './utils/del';
 
@@ -21,7 +21,8 @@ function getFileHash(contents: Buffer): string {
 	return hash;
 }
 
-function createFileParseContents(contents: any = '') {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function createFileParseContents(contents: any = ''): string {
 	let fileContents = contents;
 
 	if (fileContents === null) {
@@ -40,20 +41,20 @@ function createFileParseContents(contents: any = '') {
 	return fileContents;
 }
 
-function sandboxDestroyed() {
+function sandboxDestroyed(): void {
 	throw new Error('sandbox has been destroyed. Create new instance');
 }
 
 // https://stackoverflow.com/a/1527820
-function getRandomInteger(min: number = 1, max: number = 100) {
+function getRandomInteger(min: number = 1, max: number = 100): number {
 	const randomInteger = Math.floor(Math.random() * (max - min + 1)) + min;
 
 	return randomInteger;
 }
 
-type Options = {
+interface Options {
 	randomDir?: boolean;
-};
+}
 
 class TempSandbox {
 	public readonly dir: string;
@@ -63,7 +64,7 @@ class TempSandbox {
 		deleteFileDeprecated: boolean;
 	};
 
-	constructor(options: Options = {}) {
+	public constructor(options: Options = {}) {
 		const opts = {
 			randomDir: false,
 			...options,
@@ -158,7 +159,8 @@ class TempSandbox {
 		this.destroySandboxSync = this.destroySandboxSync.bind(this);
 	}
 
-	path = {
+	// eslint-disable-next-line @typescript-eslint/member-ordering
+	public path = {
 		resolve: (dir: string): string => {
 			const absolute = path.resolve(this.dir, dir);
 			const relative = path.relative(this.dir, absolute);
@@ -188,7 +190,7 @@ class TempSandbox {
 		},
 	};
 
-	absolutePath(dir: string): string {
+	public absolutePath(dir: string): string {
 		if (this.warnings.absolutePathDeprecated === false) {
 			// eslint-disable-next-line no-console
 			console.warn(
@@ -201,14 +203,14 @@ class TempSandbox {
 		return this.path.resolve(dir);
 	}
 
-	async createDir(dir: string): Promise<string> {
+	public async createDir(dir: string): Promise<string> {
 		const normalized = this.path.resolve(dir);
 		const dirCreated = await makeDir(normalized);
 
 		return this.path.relative(dirCreated);
 	}
 
-	createDirSync(dir: string): string {
+	public createDirSync(dir: string): string {
 		const normalized = this.path.resolve(dir);
 
 		const dirCreated = makeDirSync(normalized);
@@ -216,7 +218,8 @@ class TempSandbox {
 		return this.path.relative(dirCreated);
 	}
 
-	async createFile(file: string, contents: any = ''): Promise<void> {
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	public async createFile(file: string, contents: any = ''): Promise<void> {
 		const fileDir = path.parse(file).dir;
 
 		if (fileDir) {
@@ -228,7 +231,8 @@ class TempSandbox {
 		await writeFile(filePath, fileContents);
 	}
 
-	createFileSync(file: string, contents: any = ''): void {
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	public createFileSync(file: string, contents: any = ''): void {
 		const fileDir = path.parse(file).dir;
 
 		if (fileDir) {
@@ -241,16 +245,18 @@ class TempSandbox {
 		fs.writeFileSync(filePath, fileContents);
 	}
 
-	async delete(patterns: string | string[]): Promise<string[]> {
-		(Array.isArray(patterns) ? patterns : [patterns]).forEach((pattern) => {
-			const filePath = this.path.resolve(pattern);
+	public async delete(patterns: string | string[]): Promise<string[]> {
+		(Array.isArray(patterns) ? patterns : [patterns]).forEach(
+			(pattern): void => {
+				const filePath = this.path.resolve(pattern);
 
-			if (filePath === this.dir) {
-				throw new Error(
-					'Use sandbox.destroySandbox() to delete the sandbox.',
-				);
-			}
-		});
+				if (filePath === this.dir) {
+					throw new Error(
+						'Use sandbox.destroySandbox() to delete the sandbox.',
+					);
+				}
+			},
+		);
 
 		const removed = await del(patterns, {
 			root: this.dir,
@@ -259,12 +265,12 @@ class TempSandbox {
 			force: true,
 		});
 
-		return removed.map((removedFiles) => {
+		return removed.map((removedFiles): string => {
 			return this.path.relative(removedFiles);
 		});
 	}
 
-	async deleteFile(patterns: string | string[]): Promise<string[]> {
+	public async deleteFile(patterns: string | string[]): Promise<string[]> {
 		if (this.warnings.deleteFileDeprecated === false) {
 			// eslint-disable-next-line no-console
 			console.warn(
@@ -277,16 +283,18 @@ class TempSandbox {
 		return this.delete(patterns);
 	}
 
-	deleteSync(patterns: string | string[]): string[] {
-		(Array.isArray(patterns) ? patterns : [patterns]).forEach((pattern) => {
-			const filePath = this.path.resolve(pattern);
+	public deleteSync(patterns: string | string[]): string[] {
+		(Array.isArray(patterns) ? patterns : [patterns]).forEach(
+			(pattern): void => {
+				const filePath = this.path.resolve(pattern);
 
-			if (filePath === this.dir) {
-				throw new Error(
-					'Use sandbox.destroySandboxSync() to delete the sandbox.',
-				);
-			}
-		});
+				if (filePath === this.dir) {
+					throw new Error(
+						'Use sandbox.destroySandboxSync() to delete the sandbox.',
+					);
+				}
+			},
+		);
 
 		const removed = del.sync(patterns, {
 			root: this.dir,
@@ -295,12 +303,12 @@ class TempSandbox {
 			force: true,
 		});
 
-		return removed.map((removedFiles: string) => {
+		return removed.map((removedFiles: string): string => {
 			return this.path.relative(removedFiles);
 		});
 	}
 
-	deleteFileSync(patterns: string | string[]): string[] {
+	public deleteFileSync(patterns: string | string[]): string[] {
 		if (this.warnings.deleteFileDeprecated === false) {
 			// eslint-disable-next-line no-console
 			console.warn(
@@ -313,7 +321,7 @@ class TempSandbox {
 		return this.deleteSync(patterns);
 	}
 
-	async readFile(file: string): Promise<unknown> {
+	public async readFile(file: string): Promise<unknown> {
 		const filePath = this.path.resolve(file);
 		let contents = await readFile(filePath, 'utf8');
 
@@ -326,7 +334,7 @@ class TempSandbox {
 		return contents;
 	}
 
-	readFileSync(file: string): unknown {
+	public readFileSync(file: string): unknown {
 		const filePath = this.path.resolve(file);
 
 		let contents = fs.readFileSync(filePath, 'utf8');
@@ -340,7 +348,7 @@ class TempSandbox {
 		return contents;
 	}
 
-	async getFileHash(file: string): Promise<string> {
+	public async getFileHash(file: string): Promise<string> {
 		const filePath = this.path.resolve(file);
 		const contents = await readFile(filePath);
 
@@ -349,7 +357,7 @@ class TempSandbox {
 		return fileHash;
 	}
 
-	getFileHashSync(file: string): string {
+	public getFileHashSync(file: string): string {
 		const filePath = this.path.resolve(file);
 		const contents = fs.readFileSync(filePath);
 
@@ -358,7 +366,7 @@ class TempSandbox {
 		return fileHash;
 	}
 
-	async getFileList(dir?: string): Promise<string[]> {
+	public async getFileList(dir?: string): Promise<string[]> {
 		const readDir = dir ? this.path.resolve(dir) : this.dir;
 
 		const fileList = await readDirDeep(readDir);
@@ -366,15 +374,17 @@ class TempSandbox {
 		return fileList;
 	}
 
-	getFileListSync(dir?: string): string[] {
+	public getFileListSync(dir?: string): string[] {
 		const readDir = dir ? this.path.resolve(dir) : this.dir;
 		const fileList = readDirDeepSync(readDir);
 
 		return fileList;
 	}
 
-	async getAllFilesHash(dir?: string): Promise<{ [key: string]: string }> {
-		const fileList = (await this.getFileList(dir)).map((file) => {
+	public async getAllFilesHash(
+		dir?: string,
+	): Promise<{ [key: string]: string }> {
+		const fileList = (await this.getFileList(dir)).map((file): string => {
 			if (!dir) {
 				return file;
 			}
@@ -383,27 +393,33 @@ class TempSandbox {
 		});
 
 		const result: { [key: string]: string } = {};
-		const pending = fileList.map(async (file: string) => {
-			const hash = await this.getFileHash(file);
+		const pending = fileList.map(
+			async (file: string): Promise<void> => {
+				const hash = await this.getFileHash(file);
 
-			const subPath = dir ? slash(this.path.relative(dir, file)) : file;
+				const subPath = dir
+					? slash(this.path.relative(dir, file))
+					: file;
 
-			result[subPath] = hash;
-		});
+				result[subPath] = hash;
+			},
+		);
 
 		await Promise.all(pending);
 
 		const sortedResult = Object.keys(result)
-			.sort()
-			.reduce((acc, item) => {
+			.sort((a: string, b: string): number => {
+				return a.localeCompare(b);
+			})
+			.reduce((acc, item): { [key: string]: string } => {
 				return { ...acc, [item]: result[item] };
 			}, {});
 
 		return sortedResult;
 	}
 
-	getAllFilesHashSync(dir?: string): { [key: string]: string } {
-		const fileList = this.getFileListSync(dir).map((file) => {
+	public getAllFilesHashSync(dir?: string): { [key: string]: string } {
+		const fileList = this.getFileListSync(dir).map((file): string => {
 			if (!dir) {
 				return file;
 			}
@@ -412,7 +428,10 @@ class TempSandbox {
 		});
 
 		const result: { [key: string]: string } = fileList.reduce(
-			(acc: { [key: string]: string }, file: string) => {
+			(
+				acc: { [key: string]: string },
+				file: string,
+			): { [key: string]: string } => {
 				const fileHash = this.getFileHashSync(file);
 				const subPath = dir
 					? slash(this.path.relative(dir, file))
@@ -427,15 +446,17 @@ class TempSandbox {
 		);
 
 		const sortedResult = Object.keys(result)
-			.sort()
-			.reduce((acc, item) => {
+			.sort((a: string, b: string): number => {
+				return a.localeCompare(b);
+			})
+			.reduce((acc, item): { [key: string]: string } => {
 				return { ...acc, [item]: result[item] };
 			}, {});
 
 		return sortedResult;
 	}
 
-	async clean(): Promise<string[]> {
+	public async clean(): Promise<string[]> {
 		const removed = await del('**/*', {
 			root: this.dir,
 			cwd: this.dir,
@@ -443,12 +464,12 @@ class TempSandbox {
 			force: true,
 		});
 
-		return removed.map((removedFiles) => {
+		return removed.map((removedFiles): string => {
 			return this.path.relative(removedFiles);
 		});
 	}
 
-	cleanSync(): string[] {
+	public cleanSync(): string[] {
 		const removed = del.sync('**/*', {
 			root: this.dir,
 			cwd: this.dir,
@@ -456,12 +477,12 @@ class TempSandbox {
 			force: true,
 		});
 
-		return removed.map((removedFiles: string) => {
+		return removed.map((removedFiles: string): string => {
 			return this.path.relative(removedFiles);
 		});
 	}
 
-	async destroySandbox(): Promise<string[]> {
+	public async destroySandbox(): Promise<string[]> {
 		const removed = await del(this.dir, { force: true });
 
 		for (const key of Object.keys(this)) {
@@ -477,7 +498,7 @@ class TempSandbox {
 		return removed;
 	}
 
-	destroySandboxSync(): string[] {
+	public destroySandboxSync(): string[] {
 		const removed = del.sync(this.dir, { force: true });
 
 		for (const key of Object.keys(this)) {
