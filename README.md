@@ -24,9 +24,11 @@ const sandbox = new TempSandbox();
 
 // Create sandbox with randomized directory name
 // Typically used inside of a beforeEach
-const sandboxRandom = new TempSandbox({ randomDir: true });
+let sandboxRandom = new TempSandbox({ randomDir: true });
 
 beforeEach(async () => {
+	sandboxRandom = new TempSandbox({ randomDir: true });
+
 	// Remove all files/directories inside sandbox
 	await sandbox.clean();
 	sandbox.cleanSync();
