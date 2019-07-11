@@ -20,63 +20,63 @@ const packageId = '@backtrack/preset-jest';
  * https://jestjs.io/docs/en/configuration
  */
 const jest = {
-    testEnvironment: 'node',
-    collectCoverage: false,
-    coveragePathIgnorePatterns: [
-        '<rootDir>/(.*/?)__sandbox__',
-        '<rootDir>/jest.*.(js|ts|mjs)',
-    ],
-    testPathIgnorePatterns: ['<rootDir>/(.*/?)__sandbox__'],
-    snapshotSerializers: [
-        pkg.resolve(packageId, 'jest-serializer-path'),
-        pkg.resolve(packageId, 'jest-snapshot-serializer-function-name'),
-    ],
+	testEnvironment: 'node',
+	collectCoverage: false,
+	coveragePathIgnorePatterns: [
+		'<rootDir>/(.*/?)__sandbox__',
+		'<rootDir>/jest.*.(js|ts|mjs)',
+	],
+	testPathIgnorePatterns: ['<rootDir>/(.*/?)__sandbox__'],
+	snapshotSerializers: [
+		pkg.resolve(packageId, 'jest-serializer-path'),
+		pkg.resolve(packageId, 'jest-snapshot-serializer-function-name'),
+	],
 
-    /**
-     * Automatically reset mock state between every test.
-     * Equivalent to calling jest.resetAllMocks() between each test.
-     *
-     * Sane default with resetModules: true because mocks need to be inside beforeEach
-     * for them to work correctly
-     *
-     * https://jestjs.io/docs/en/configuration#resetmocks-boolean
-     */
-    resetMocks: true,
+	/**
+	 * Automatically reset mock state between every test.
+	 * Equivalent to calling jest.resetAllMocks() between each test.
+	 *
+	 * Sane default with resetModules: true because mocks need to be inside beforeEach
+	 * for them to work correctly
+	 *
+	 * https://jestjs.io/docs/en/configuration#resetmocks-boolean
+	 */
+	resetMocks: true,
 
-    /**
-     *  The module registry for every test file will be reset before running each individual test.
-     *  This is useful to isolate modules for every test so that local module state doesn't conflict between tests.
-     *
-     *  https://jestjs.io/docs/en/configuration#resetmodules-boolean
-     */
-    resetModules: true,
+	/**
+	 *  The module registry for every test file will be reset before running each individual test.
+	 *  This is useful to isolate modules for every test so that local module state doesn't conflict between tests.
+	 *
+	 *  https://jestjs.io/docs/en/configuration#resetmodules-boolean
+	 */
+	resetModules: true,
 
-    /**
-     * Equivalent to calling jest.restoreAllMocks() between each test.
-     *
-     * Resets jest.spyOn mocks only
-     *
-     * https://jestjs.io/docs/en/configuration#restoremocks-boolean
-     */
-    restoreMocks: true,
+	/**
+	 * Equivalent to calling jest.restoreAllMocks() between each test.
+	 *
+	 * Resets jest.spyOn mocks only
+	 *
+	 * https://jestjs.io/docs/en/configuration#restoremocks-boolean
+	 */
+	restoreMocks: true,
 };
 
 function getFile(file) {
-    const jsFile = `${file}.js`;
-    const jsFileExists = fs.existsSync(jsFile);
+	const jsFile = `${file}.js`;
+	const jsFileExists = fs.existsSync(jsFile);
 
-    if (jsFileExists) {
-        return jsFile;
-    }
+	if (jsFileExists) {
+		return jsFile;
+	}
 
-    const tsFile = `${file}.ts`;
-    const tsFileExists = fs.existsSync(tsFile);
+	const tsFile = `${file}.ts`;
+	const tsFileExists = fs.existsSync(tsFile);
 
-    if (tsFileExists) {
-        return tsFile;
-    }
+	if (tsFileExists) {
+		return tsFile;
+	}
 
-    return null;
+	return null;
 }
 
 /**
@@ -86,7 +86,7 @@ function getFile(file) {
  */
 const globalSetup = getFile('jest.global-setup');
 if (globalSetup !== null) {
-    jest.globalSetup = `<rootDir>/${globalSetup}`;
+	jest.globalSetup = `<rootDir>/${globalSetup}`;
 }
 
 /**
@@ -96,7 +96,7 @@ if (globalSetup !== null) {
  */
 const setupFiles = getFile('jest.setup-test-file');
 if (setupFiles !== null) {
-    jest.setupFiles = [`<rootDir>/${setupFiles}`];
+	jest.setupFiles = [`<rootDir>/${setupFiles}`];
 }
 
 /**
@@ -106,7 +106,7 @@ if (setupFiles !== null) {
  */
 const setupFilesAfterEnv = getFile('jest.setup-test');
 if (setupFilesAfterEnv !== null) {
-    jest.setupFilesAfterEnv = [`<rootDir>/${setupFilesAfterEnv}`];
+	jest.setupFilesAfterEnv = [`<rootDir>/${setupFilesAfterEnv}`];
 }
 
 /**
@@ -116,10 +116,10 @@ if (setupFilesAfterEnv !== null) {
  */
 const globalTeardown = getFile('jest.global-teardown');
 if (globalTeardown !== null) {
-    jest.globalTeardown = `<rootDir>/${globalTeardown}`;
+	jest.globalTeardown = `<rootDir>/${globalTeardown}`;
 }
 
 module.exports = configManager({
-    namespace: 'jest',
-    config: jest,
+	namespace: 'jest',
+	config: jest,
 });

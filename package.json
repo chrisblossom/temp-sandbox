@@ -9,6 +9,7 @@
     "test"
   ],
   "license": "MIT",
+  "private": false,
   "repository": "chrisblossom/temp-sandbox",
   "homepage": "https://github.com/chrisblossom/temp-sandbox",
   "author": "Chris Blossom",
@@ -22,6 +23,7 @@
   "types": "dist/temp-sandbox.d.ts",
   "scripts": {
     "build": "backtrack build --production",
+    "check.all": "backtrack check.all",
     "clean": "backtrack clean",
     "dev": "backtrack dev --development",
     "format": "backtrack format",
@@ -30,6 +32,7 @@
     "lint": "backtrack lint",
     "lint.fix": "backtrack lint.fix",
     "prepublishOnly": "backtrack prepublishOnly",
+    "release": "backtrack release",
     "test": "backtrack test",
     "test.ci": "backtrack test.ci",
     "test.ci-pretest": "backtrack test.ci-pretest",
@@ -39,7 +42,7 @@
   },
   "devDependencies": {
     "@backtrack/core": "^0.2.0",
-    "@backtrack/preset-node": "^0.4.3",
+    "@backtrack/preset-node": "^0.6.2",
     "@types/jest": "^24.0.13",
     "@types/node": "^12.0.2",
     "typescript": "^3.4.5"
