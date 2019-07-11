@@ -369,14 +369,24 @@ class TempSandbox {
 	public async getFileList(dir?: string): Promise<string[]> {
 		const readDir = dir ? this.path.resolve(dir) : this.dir;
 
-		const fileList = await readDirDeep(readDir);
+		const fileList = await readDirDeep(readDir, {
+			cwd: this.dir,
+			absolute: false,
+			ignore: [],
+			gitignore: false,
+		});
 
 		return fileList;
 	}
 
 	public getFileListSync(dir?: string): string[] {
 		const readDir = dir ? this.path.resolve(dir) : this.dir;
-		const fileList = readDirDeepSync(readDir);
+		const fileList = readDirDeepSync(readDir, {
+			cwd: this.dir,
+			absolute: false,
+			ignore: [],
+			gitignore: false,
+		});
 
 		return fileList;
 	}
@@ -384,24 +394,14 @@ class TempSandbox {
 	public async getAllFilesHash(
 		dir?: string,
 	): Promise<{ [key: string]: string }> {
-		const fileList = (await this.getFileList(dir)).map((file): string => {
-			if (!dir) {
-				return file;
-			}
-
-			return path.join(dir, file);
-		});
+		const fileList = await this.getFileList(dir);
 
 		const result: { [key: string]: string } = {};
 		const pending = fileList.map(
 			async (file: string): Promise<void> => {
 				const hash = await this.getFileHash(file);
 
-				const subPath = dir
-					? slash(this.path.relative(dir, file))
-					: file;
-
-				result[subPath] = hash;
+				result[file] = hash;
 			},
 		);
 
@@ -419,13 +419,7 @@ class TempSandbox {
 	}
 
 	public getAllFilesHashSync(dir?: string): { [key: string]: string } {
-		const fileList = this.getFileListSync(dir).map((file): string => {
-			if (!dir) {
-				return file;
-			}
-
-			return path.join(dir, file);
-		});
+		const fileList = this.getFileListSync(dir);
 
 		const result: { [key: string]: string } = fileList.reduce(
 			(
@@ -433,13 +427,10 @@ class TempSandbox {
 				file: string,
 			): { [key: string]: string } => {
 				const fileHash = this.getFileHashSync(file);
-				const subPath = dir
-					? slash(this.path.relative(dir, file))
-					: file;
 
 				return {
 					...acc,
-					[subPath]: fileHash,
+					[file]: fileHash,
 				};
 			},
 			{},

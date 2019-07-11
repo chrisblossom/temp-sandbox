@@ -754,7 +754,7 @@ describe('getFileList', () => {
 				'nested/file2.js',
 			]);
 
-			expect(subFileList).toEqual(['b/c/file3.js', 'c/file1.js']);
+			expect(subFileList).toEqual(['a/c/file1.js', 'a/b/c/file3.js']);
 		};
 
 		test('async', async () => {
@@ -880,8 +880,8 @@ describe('getAllFilesHash', () => {
 
 		const checkResult = (filesHash: { [key: string]: string }) => {
 			expect(filesHash).toEqual({
-				'b/c/file3.js': 'd41d8cd98f00b204e9800998ecf8427e',
-				'c/file1.js': 'd41d8cd98f00b204e9800998ecf8427e',
+				'a/b/c/file3.js': 'd41d8cd98f00b204e9800998ecf8427e',
+				'a/c/file1.js': 'd41d8cd98f00b204e9800998ecf8427e',
 			});
 		};
 

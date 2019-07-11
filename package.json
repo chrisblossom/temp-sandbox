@@ -51,7 +51,7 @@
     "del": "^4.1.1",
     "make-dir": "^3.0.0",
     "parent-module": "^2.0.0",
-    "read-dir-deep": "^6.0.0",
+    "read-dir-deep": "^7.0.1",
     "read-pkg-up": "^6.0.0",
     "slash": "^3.0.0"
   }
