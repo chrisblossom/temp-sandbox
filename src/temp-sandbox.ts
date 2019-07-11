@@ -7,7 +7,6 @@ import makeDir, { sync as makeDirSync } from 'make-dir';
 import parentModule from 'parent-module';
 import readPkgUp from 'read-pkg-up';
 import { readDirDeep, readDirDeepSync } from 'read-dir-deep';
-import slash from 'slash';
 import { del } from './utils/del';
 
 const writeFile = promisify(fs.writeFile);
@@ -259,7 +258,6 @@ class TempSandbox {
 		);
 
 		const removed = await del(patterns, {
-			root: this.dir,
 			cwd: this.dir,
 			dot: true,
 			force: true,
@@ -297,7 +295,6 @@ class TempSandbox {
 		);
 
 		const removed = del.sync(patterns, {
-			root: this.dir,
 			cwd: this.dir,
 			dot: true,
 			force: true,
@@ -449,7 +446,6 @@ class TempSandbox {
 
 	public async clean(): Promise<string[]> {
 		const removed = await del('**/*', {
-			root: this.dir,
 			cwd: this.dir,
 			dot: true,
 			force: true,
@@ -462,7 +458,6 @@ class TempSandbox {
 
 	public cleanSync(): string[] {
 		const removed = del.sync('**/*', {
-			root: this.dir,
 			cwd: this.dir,
 			dot: true,
 			force: true,
