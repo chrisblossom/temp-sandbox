@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import slash from 'slash';
 import { sync as makeDirSync } from 'make-dir';
 import { TempSandbox as TempSandboxType } from './temp-sandbox';
 
@@ -74,7 +75,7 @@ describe('path.resolve', () => {
 		const pathname = 'nested/path';
 		const result = sandbox.path.resolve(pathname);
 
-		const expected = path.resolve(sandbox.dir, pathname);
+		const expected = slash(path.resolve(sandbox.dir, pathname));
 		expect(result).toEqual(expected);
 	});
 
@@ -94,7 +95,7 @@ describe('path.resolve', () => {
 	});
 
 	test('handles path inside of sandbox dir', () => {
-		const pathname = path.resolve(sandbox.dir, 'nested/path');
+		const pathname = slash(path.resolve(sandbox.dir, 'nested/path'));
 
 		const result = sandbox.path.resolve(pathname);
 
@@ -106,7 +107,7 @@ describe('path.resolve', () => {
 
 		const result = sandbox.path.resolve(pathname);
 
-		const expected = path.resolve(sandbox.dir, pathname);
+		const expected = slash(path.resolve(sandbox.dir, pathname));
 
 		expect(result).toEqual(expected);
 	});
@@ -117,7 +118,7 @@ describe('path.relative', () => {
 		const pathname = path.resolve(sandbox.dir, 'nested/path');
 		const result = sandbox.path.relative(pathname);
 
-		expect(result).toEqual(path.normalize('nested/path'));
+		expect(result).toEqual('nested/path');
 	});
 
 	test('handles sandbox.dir', () => {
@@ -169,7 +170,7 @@ describe('createDir', () => {
 		const checkResult = (result: string) => {
 			const expectedDir = sandbox.path.resolve(pathname);
 
-			expect(result).toEqual(path.normalize('nested/path'));
+			expect(result).toEqual(pathname);
 			const dirExists = fs.statSync(expectedDir).isDirectory();
 			expect(dirExists).toEqual(true);
 		};
@@ -861,17 +862,15 @@ describe('clean', () => {
 
 			// use set to ignore order
 			expect(new Set(removed)).toEqual(
-				new Set(
-					[
-						'a',
-						'a/b',
-						'a/b/c',
-						'a/b/c/file3.js',
-						'file1.js',
-						'nested',
-						'nested/file2.js',
-					].map(path.normalize),
-				),
+				new Set([
+					'a',
+					'a/b',
+					'a/b/c',
+					'a/b/c/file3.js',
+					'file1.js',
+					'nested',
+					'nested/file2.js',
+				]),
 			);
 		};
 

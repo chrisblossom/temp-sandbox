@@ -104,7 +104,9 @@ class TempSandbox {
 		/**
 		 * Each temp directory will be unique to the file
 		 */
-		this.dir = path.resolve(baseDir, `${relateParentStrippedExt}-${dirId}`);
+		this.dir = slash(
+			path.resolve(baseDir, `${relateParentStrippedExt}-${dirId}`),
+		);
 
 		// Remove target temp directory if it already exists
 		if (fs.existsSync(this.dir)) {
@@ -402,7 +404,7 @@ class TempSandbox {
 		});
 
 		return removed.map((removedFiles): string => {
-			return this.path.relative(removedFiles);
+			return slash(this.path.relative(removedFiles));
 		});
 	}
 
@@ -414,7 +416,7 @@ class TempSandbox {
 		});
 
 		return removed.map((removedFiles: string): string => {
-			return this.path.relative(removedFiles);
+			return slash(this.path.relative(removedFiles));
 		});
 	}
 
@@ -431,7 +433,9 @@ class TempSandbox {
 			}
 		}
 
-		return removed;
+		return removed.map((file): string => {
+			return slash(file);
+		});
 	}
 
 	public destroySandboxSync(): string[] {
@@ -447,7 +451,9 @@ class TempSandbox {
 			}
 		}
 
-		return removed;
+		return removed.map((file): string => {
+			return slash(file);
+		});
 	}
 }
 
