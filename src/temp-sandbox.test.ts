@@ -1,5 +1,3 @@
-/* eslint-disable jest/prefer-inline-snapshots */
-
 import fs from 'fs';
 import path from 'path';
 import { sync as makeDirSync } from 'make-dir';
@@ -81,23 +79,18 @@ describe('path.resolve', () => {
 	});
 
 	test('does not allow paths outside of sandbox dir', () => {
-		expect.hasAssertions();
 		const pathname = '../';
-		try {
-			sandbox.path.resolve(pathname);
-		} catch (error) {
-			expect(error).toMatchSnapshot();
-		}
+		expect(() =>
+			sandbox.path.resolve(pathname),
+		).toThrowErrorMatchingInlineSnapshot(`"../ is outside sandbox"`);
 	});
 
 	test('handles path outside of sandbox dir', () => {
-		expect.hasAssertions();
-
-		try {
-			sandbox.path.resolve(process.cwd());
-		} catch (error) {
-			expect(error).toMatchSnapshot();
-		}
+		expect(() =>
+			sandbox.path.resolve(process.cwd()),
+		).toThrowErrorMatchingInlineSnapshot(
+			`"<PROJECT_ROOT> is outside sandbox"`,
+		);
 	});
 
 	test('handles path inside of sandbox dir', () => {
@@ -150,25 +143,22 @@ describe('path.relative', () => {
 	});
 
 	test('cannot be outside sandbox dir', () => {
-		expect.hasAssertions();
-
 		const pathname = path.resolve(__dirname, 'nested/path');
-		try {
-			sandbox.path.relative(pathname);
-		} catch (error) {
-			expect(error).toMatchSnapshot();
-		}
+		expect(() =>
+			sandbox.path.relative(pathname),
+		).toThrowErrorMatchingInlineSnapshot(
+			`"<PROJECT_ROOT>/src/nested/path is outside sandbox"`,
+		);
 	});
 
 	test('second dir cannot be outside sandbox dir', () => {
-		expect.hasAssertions();
-
 		const pathname = path.resolve(__dirname, 'nested/path');
-		try {
-			sandbox.path.relative(sandbox.dir, pathname);
-		} catch (error) {
-			expect(error).toMatchSnapshot();
-		}
+
+		expect(() =>
+			sandbox.path.relative(pathname),
+		).toThrowErrorMatchingInlineSnapshot(
+			`"<PROJECT_ROOT>/src/nested/path is outside sandbox"`,
+		);
 	});
 });
 
@@ -360,20 +350,28 @@ describe('createFile', () => {
 		const file = 'file1.js';
 		const contents = { packageJson: 'test' };
 
-		const checkResult = () => {
-			const fullFilePath = sandbox.path.resolve(file);
-			const fileContents = fs.readFileSync(fullFilePath, 'utf8');
-			expect(fileContents).toMatchSnapshot();
-		};
-
 		test('async', async () => {
 			await sandbox.createFile(file, contents);
-			checkResult();
+			const fullFilePath = sandbox.path.resolve(file);
+			const fileContents = fs.readFileSync(fullFilePath, 'utf8');
+			expect(fileContents).toMatchInlineSnapshot(`
+			"{
+			    \\"packageJson\\": \\"test\\"
+			}
+			"
+		`);
 		});
 
 		test('sync', () => {
 			sandbox.createFileSync(file, contents);
-			checkResult();
+			const fullFilePath = sandbox.path.resolve(file);
+			const fileContents = fs.readFileSync(fullFilePath, 'utf8');
+			expect(fileContents).toMatchInlineSnapshot(`
+			"{
+			    \\"packageJson\\": \\"test\\"
+			}
+			"
+		`);
 		});
 	});
 });
@@ -481,21 +479,19 @@ describe('delete', () => {
 		const file = '.';
 
 		test('async', async () => {
-			expect.hasAssertions();
-			try {
-				await sandbox.delete(file);
-			} catch (error) {
-				expect(error).toMatchSnapshot();
-			}
+			await expect(
+				sandbox.delete(file),
+			).rejects.toThrowErrorMatchingInlineSnapshot(
+				`"Use sandbox.destroySandbox() to delete the sandbox."`,
+			);
 		});
 
 		test('sync', () => {
-			expect.hasAssertions();
-			try {
-				sandbox.deleteSync(file);
-			} catch (error) {
-				expect(error).toMatchSnapshot();
-			}
+			expect(() =>
+				sandbox.deleteSync(file),
+			).toThrowErrorMatchingInlineSnapshot(
+				`"Use sandbox.destroySandboxSync() to delete the sandbox."`,
+			);
 		});
 	});
 
@@ -503,45 +499,39 @@ describe('delete', () => {
 		const file = ['file1.js', '.'];
 
 		test('async', async () => {
-			expect.hasAssertions();
-			try {
-				await sandbox.delete(file);
-			} catch (error) {
-				expect(error).toMatchSnapshot();
-			}
+			await expect(
+				sandbox.delete(file),
+			).rejects.toThrowErrorMatchingInlineSnapshot(
+				`"Use sandbox.destroySandbox() to delete the sandbox."`,
+			);
 		});
 
 		test('sync', () => {
-			expect.hasAssertions();
-			try {
-				sandbox.deleteSync(file);
-			} catch (error) {
-				expect(error).toMatchSnapshot();
-			}
+			expect(() =>
+				sandbox.deleteSync(file),
+			).toThrowErrorMatchingInlineSnapshot(
+				`"Use sandbox.destroySandboxSync() to delete the sandbox."`,
+			);
 		});
 	});
 
 	describe('throws when undefined', () => {
 		test('async', async () => {
-			expect.hasAssertions();
-			try {
+			await expect(
 				// @ts-ignore
-				await sandbox.delete();
-			} catch (error) {
-				expect(error.message).toContain('string');
-				expect(error.message).toContain('undefined');
-			}
+				sandbox.delete(),
+			).rejects.toThrowErrorMatchingInlineSnapshot(
+				`"The \\"path\\" argument must be of type string. Received type undefined"`,
+			);
 		});
 
 		test('sync', () => {
-			expect.hasAssertions();
-			try {
+			expect(() =>
 				// @ts-ignore
-				sandbox.deleteSync();
-			} catch (error) {
-				expect(error.message).toContain('string');
-				expect(error.message).toContain('undefined');
-			}
+				sandbox.deleteSync(),
+			).toThrowErrorMatchingInlineSnapshot(
+				`"The \\"path\\" argument must be of type string. Received type undefined"`,
+			);
 		});
 	});
 });
@@ -607,49 +597,33 @@ describe('getFileHash', () => {
 
 	describe('handles file that does not exist', () => {
 		test('async', async () => {
-			expect.hasAssertions();
-			try {
-				const file = 'file1.js';
-
-				await sandbox.getFileHash(file);
-			} catch (error) {
-				expect(error.code).toEqual('ENOENT');
-			}
+			const file = 'file1.js';
+			await expect(sandbox.getFileHash(file)).rejects.toThrow(
+				'ENOENT: no such file or directory',
+			);
 		});
 
 		test('sync', () => {
-			expect.hasAssertions();
-			try {
-				const file = 'file1.js';
-
-				sandbox.getFileHashSync(file);
-			} catch (error) {
-				expect(error.code).toEqual('ENOENT');
-			}
+			const file = 'file1.js';
+			expect(() => sandbox.getFileHashSync(file)).toThrow(
+				'ENOENT: no such file or directory',
+			);
 		});
 	});
 
 	describe('handles nested file that does not exist', () => {
 		test('async', async () => {
-			expect.hasAssertions();
-			try {
-				const file = 'nested/file1.js';
-
-				await sandbox.getFileHash(file);
-			} catch (error) {
-				expect(error.code).toEqual('ENOENT');
-			}
+			const file = 'nested/file1.js';
+			await expect(sandbox.getFileHash(file)).rejects.toThrow(
+				'ENOENT: no such file or directory',
+			);
 		});
 
 		test('sync', () => {
-			expect.hasAssertions();
-			try {
-				const file = 'nested/file1.js';
-
-				sandbox.getFileHashSync(file);
-			} catch (error) {
-				expect(error.code).toEqual('ENOENT');
-			}
+			const file = 'nested/file1.js';
+			expect(() => sandbox.getFileHashSync(file)).toThrow(
+				'ENOENT: no such file or directory',
+			);
 		});
 	});
 });
@@ -981,20 +955,12 @@ describe('destroySandbox', () => {
 			const methods = getAllMethods(sandbox);
 
 			methods.forEach((method) => {
-				try {
-					// @ts-ignore
-					const fn = sandbox[method];
-					expect(fn.name).toEqual('sandboxDestroyed');
-
-					fn();
-
-					// ensure test throws error
-					expect(method).toEqual(`${method} failed to throw`);
-				} catch (error) {
-					expect(error.message).toContain(
-						'sandbox has been destroyed',
-					);
-				}
+				// @ts-ignore
+				const fn = sandbox[method];
+				expect(fn.name).toEqual('sandboxDestroyed');
+				expect(() => fn()).toThrow(
+					'sandbox has been destroyed. Create new instance',
+				);
 			});
 		};
 
