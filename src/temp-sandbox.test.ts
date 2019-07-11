@@ -3,10 +3,12 @@
 import fs from 'fs';
 import path from 'path';
 import { sync as makeDirSync } from 'make-dir';
+import { TempSandbox as TempSandboxType } from './temp-sandbox';
 
-// eslint-disable-next-line @typescript-eslint/no-extraneous-class
-class TempSandbox {
+class TempSandbox extends TempSandboxType {
 	public constructor(...args: any) {
+		super();
+
 		const TempSandboxActual = require('./temp-sandbox').TempSandbox;
 
 		const tempSandBox = new TempSandboxActual(...args);
@@ -15,7 +17,7 @@ class TempSandbox {
 	}
 }
 
-let sandbox: any;
+let sandbox = new TempSandbox({ randomDir: true });
 
 beforeEach(() => {
 	sandbox = new TempSandbox({ randomDir: true });
@@ -523,6 +525,7 @@ describe('delete', () => {
 		test('async', async () => {
 			expect.hasAssertions();
 			try {
+				// @ts-ignore
 				await sandbox.delete();
 			} catch (error) {
 				expect(error.message).toContain('string');
@@ -533,6 +536,7 @@ describe('delete', () => {
 		test('sync', () => {
 			expect.hasAssertions();
 			try {
+				// @ts-ignore
 				sandbox.deleteSync();
 			} catch (error) {
 				expect(error.message).toContain('string');
@@ -932,7 +936,7 @@ describe('destroySandbox', () => {
 	/**
 	 * https://stackoverflow.com/a/35033472
 	 */
-	const getAllMethods = (obj: typeof TempSandbox) => {
+	const getAllMethods = (obj: any) => {
 		/* eslint-disable no-param-reassign,no-cond-assign,no-loop-func */
 		let props: string[] = [];
 
@@ -978,6 +982,7 @@ describe('destroySandbox', () => {
 
 			methods.forEach((method) => {
 				try {
+					// @ts-ignore
 					const fn = sandbox[method];
 					expect(fn.name).toEqual('sandboxDestroyed');
 
@@ -1019,6 +1024,7 @@ describe('destroySandbox', () => {
 
 			const methods = getAllMethods(sandbox);
 			methods.forEach((method) => {
+				// @ts-ignore
 				const item = sandbox[method];
 				if (typeof item === 'function') {
 					expect(item.name).toEqual(`bound ${method}`);
