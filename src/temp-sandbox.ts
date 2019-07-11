@@ -7,6 +7,7 @@ import makeDir, { sync as makeDirSync } from 'make-dir';
 import parentModule from 'parent-module';
 import readPkgUp from 'read-pkg-up';
 import { readDirDeep, readDirDeepSync } from 'read-dir-deep';
+import slash from 'slash';
 import { del } from './utils/del';
 
 const writeFile = promisify(fs.writeFile);
@@ -176,14 +177,16 @@ class TempSandbox {
 
 			const joinWithBase = path.join(this.dir, base);
 
-			return path.resolve(joinWithBase);
+			const normalized = slash(path.resolve(joinWithBase));
+
+			return normalized;
 		},
 
 		relative: (dir1: string, dir2?: string): string => {
 			const from = dir2 ? this.path.resolve(dir1) : this.dir;
 			const to = dir2 ? this.path.resolve(dir2) : this.path.resolve(dir1);
 
-			const relative = path.relative(from, to);
+			const relative = slash(path.relative(from, to));
 
 			return relative;
 		},
