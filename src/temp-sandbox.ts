@@ -225,6 +225,12 @@ class TempSandbox {
 	public async delete(patterns: string | string[]): Promise<string[]> {
 		(Array.isArray(patterns) ? patterns : [patterns]).forEach(
 			(pattern): void => {
+				if (typeof pattern !== 'string') {
+					throw new Error(
+						`delete patterns must be a string. Received type: "${typeof pattern}"`,
+					);
+				}
+
 				const filePath = this.path.resolve(pattern);
 
 				if (filePath === this.dir) {
@@ -249,6 +255,12 @@ class TempSandbox {
 	public deleteSync(patterns: string | string[]): string[] {
 		(Array.isArray(patterns) ? patterns : [patterns]).forEach(
 			(pattern): void => {
+				if (typeof pattern !== 'string') {
+					throw new Error(
+						`delete patterns must be a string. Received type: "${typeof pattern}"`,
+					);
+				}
+
 				const filePath = this.path.resolve(pattern);
 
 				if (filePath === this.dir) {

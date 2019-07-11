@@ -521,8 +521,8 @@ describe('delete', () => {
 			await expect(
 				// @ts-ignore
 				sandbox.delete(),
-			).rejects.toThrowErrorMatchingInlineSnapshot(
-				`"The \\"path\\" argument must be of type string. Received type undefined"`,
+			).rejects.toThrow(
+				`delete patterns must be a string. Received type: "undefined"`,
 			);
 		});
 
@@ -530,8 +530,8 @@ describe('delete', () => {
 			expect(() =>
 				// @ts-ignore
 				sandbox.deleteSync(),
-			).toThrowErrorMatchingInlineSnapshot(
-				`"The \\"path\\" argument must be of type string. Received type undefined"`,
+			).toThrow(
+				`delete patterns must be a string. Received type: "undefined"`,
 			);
 		});
 	});
