@@ -115,23 +115,6 @@ describe('path.resolve', () => {
 
 		expect(result).toEqual(expected);
 	});
-
-	test('logs absolutePath as deprecated once', () => {
-		const consoleWarn = jest.spyOn(console, 'warn').mockImplementation();
-
-		const pathname = 'nested/path';
-		const result = sandbox.absolutePath(pathname);
-		sandbox.absolutePath(pathname);
-
-		const expected = path.resolve(sandbox.dir, pathname);
-		expect(result).toEqual(expected);
-
-		expect(consoleWarn.mock.calls).toEqual([
-			[
-				'absolutePath has been deprecated. Please use sandbox.path.resolve',
-			],
-		]);
-	});
 });
 
 describe('path.relative', () => {
@@ -555,46 +538,6 @@ describe('delete', () => {
 				expect(error.message).toContain('string');
 				expect(error.message).toContain('undefined');
 			}
-		});
-	});
-
-	describe('logs deleteFile(Sync) as deprecated once', () => {
-		const file = 'file1.js';
-		let fullFilePath: any;
-		let consoleWarn: any;
-
-		beforeEach(async () => {
-			consoleWarn = jest.spyOn(console, 'warn').mockImplementation();
-
-			await sandbox.createFile(file);
-			fullFilePath = sandbox.path.resolve(file);
-			expect(fs.existsSync(fullFilePath)).toEqual(true);
-		});
-
-		test('async', async () => {
-			const removed = await sandbox.deleteFile(file);
-			await sandbox.deleteFile(file);
-
-			expect(fs.existsSync(fullFilePath)).toEqual(false);
-			expect(removed).toEqual([file]);
-
-			expect(consoleWarn.mock.calls).toEqual([
-				['deleteFile has been deprecated. Use sandbox.delete instead'],
-			]);
-		});
-
-		test('sync', () => {
-			const removed = sandbox.deleteFileSync(file);
-			sandbox.deleteFileSync(file);
-
-			expect(fs.existsSync(fullFilePath)).toEqual(false);
-			expect(removed).toEqual([file]);
-
-			expect(consoleWarn.mock.calls).toEqual([
-				[
-					'deleteFileSync has been deprecated. Use sandbox.deleteSync instead',
-				],
-			]);
 		});
 	});
 });
